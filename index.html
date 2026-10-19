@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פקקים בזמן אמת • ירושלים 🚗</title>
+<meta name="description" content="מפת פקקים חיה בירושלים — לקראת המשחק בטדי.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:'Heebo',sans-serif; color:#fff; min-height:100vh;
+    background:radial-gradient(1200px 600px at 80% -10%, #2a2410 0%, transparent 60%),
+               radial-gradient(1000px 500px at 10% 0%, #101a33 0%, transparent 55%),
+               #0b0e1a;
+  }
+  .wrap { max-width:1100px; margin:0 auto; padding:22px 16px 40px; }
+  h1 { font-size:30px; font-weight:900; text-align:center; }
+  h1 .ball { color:#ffb020; }
+  .sub { text-align:center; color:#9fb2d8; margin:6px 0 18px; font-size:15px; }
+  .sub b { color:#ffb020; }
+  .toolbar { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+  .tbtn {
+    font-family:inherit; font-size:15px; font-weight:700; cursor:pointer;
+    background:rgba(255,255,255,.07); color:#e8edf8;
+    border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:10px 18px;
+    transition:all .15s;
+  }
+  .tbtn:hover { border-color:rgba(255,255,255,.35); }
+  .tbtn.active { background:#ffb020; border-color:#ffb020; color:#1a1206; }
+  .tbtn.nav { background:#33ccff; border-color:#33ccff; color:#06222e; }
+  .mapcard {
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+    border-radius:20px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.45);
+  }
+  iframe { display:block; width:100%; height:72vh; min-height:480px; border:0; background:#0e1428; }
+  .note { text-align:center; color:#6b7694; font-size:12px; margin-top:14px; line-height:1.8; }
+  .live { display:inline-flex; align-items:center; gap:7px; color:#ff7b7b; font-weight:700; font-size:14px; }
+  .live i { width:9px; height:9px; border-radius:50%; background:#ff3c3c; animation:pl 1.2s infinite; }
+  @keyframes pl { 0%,100%{opacity:1} 50%{opacity:.35} }
+  @media (max-width:480px){ h1{font-size:24px} iframe{height:68vh;min-height:420px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚗 פקקים בזמן אמת <span class="ball">•</span> ירושלים</h1>
+  <p class="sub"><span class="live"><i></i>שידור חי</span> &nbsp;•&nbsp; בית״ר ירושלים נגד מכבי תל אביב • <b>אצטדיון טדי • 20:30</b></p>
+
+  <div class="toolbar">
+    <button class="tbtn active" data-z="13" data-lat="31.7520" data-lon="35.2030">🏟️ אצטדיון טדי</button>
+    <button class="tbtn" data-z="12" data-lat="31.7683" data-lon="35.2137">🌆 ירושלים</button>
+    <button class="tbtn" data-z="11" data-lat="31.7900" data-lon="35.2000">🛣️ כניסות לעיר</button>
+    <a class="tbtn nav" href="https://waze.com/ul?ll=31.7519,35.2033&navigate=yes" target="_blank" rel="noopener" style="text-decoration:none">🧭 נווט לטדי</a>
+  </div>
+
+  <div class="mapcard">
+    <iframe id="waze" title="מפת פקקים חיה" loading="lazy"
+      src="https://embed.waze.com/iframe?zoom=13&lat=31.7520&lon=35.2030&ct=livemap"
+      allowfullscreen></iframe>
+  </div>
+
+  <p class="note">המפה: Waze Live Map — עומסי תנועה, חסימות ודיווחים בזמן אמת.<br>מומלץ לצאת מוקדם — צפי ל־29,000 אוהדים בטדי הערב 🟡⚫</p>
+</div>
+
+<script>
+  const frame = document.getElementById('waze');
+  document.querySelectorAll('.tbtn[data-z]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.tbtn[data-z]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    frame.src = `https://embed.waze.com/iframe?zoom=${b.dataset.z}&lat=${b.dataset.lat}&lon=${b.dataset.lon}&ct=livemap`;
+  }));
+</script>
+</body>
+</html>
