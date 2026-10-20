@@ -355,8 +355,9 @@ async function init(){
   bindAuth(); initAuth(); bindTheme(); countView();
 }
 function refreshView(){
-  const sel = $('instSel').value;
-  if(sel) showInst(sel); else { renderBrowse(); }
+  if($('results').style.display !== 'none' && $('q').value.trim()){ onSearch({target: $('q')}); return; }
+  if($('instView').style.display !== 'none'){ const sel = $('instSel').value; if(sel){ showInst(sel); return; } }
+  renderBrowse();
 }
 function buildSelect(){
   const s = $('instSel');
