@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>דרישות סף | תנאי קבלה לאוניברסיטאות ומכללות</title>
+<title>תוארנט | דרישות סף לאקדמיה</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ffcf00'/%3E%3Ctext x='50' y='71' font-size='52' text-anchor='middle'%3E🎓%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -116,9 +117,10 @@ footer b{color:var(--mut)}
   .controls .wrap{flex-direction:column}
   .search,.pick{min-width:0}
   header .wrap{display:flex;flex-direction:column}
-  .authbtn{position:static;align-self:flex-end;order:-1;margin-bottom:12px;max-width:75vw}
+  .topbar{position:static;align-self:flex-end;order:-1;margin-bottom:12px}
+  .authbtn{max-width:58vw}
 }
-.authbtn{position:absolute;top:16px;left:16px;z-index:5;max-width:320px;overflow:hidden;text-overflow:ellipsis;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap}
+.authbtn{max-width:320px;overflow:hidden;text-overflow:ellipsis;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap}
 .authbtn:hover{border-color:var(--teal)}
 .featbar{display:none;border-bottom:1px solid var(--line);background:var(--panel);padding:10px 0}
 .featbar.open{display:block}
@@ -155,13 +157,24 @@ table.ct th{color:var(--dim);font-weight:700;font-size:13px}
 .calcres{background:rgba(255,207,0,.07);border:1px solid rgba(255,207,0,.35);border-radius:14px;padding:16px;margin-top:14px}
 .calcres .big{font-size:32px;font-weight:900;color:var(--amber)}
 .calcres .det{font-size:13.5px;color:var(--mut);margin-top:6px}
+.topbar{position:absolute;top:16px;left:16px;z-index:5;display:flex;gap:8px;align-items:center}
+.themebtn{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--panel2);font-size:18px;cursor:pointer;line-height:1;padding:0}
+.themebtn:hover{border-color:var(--amber)}
+html[data-theme="light"]{--bg:#f4f6fc;--panel:#ffffff;--panel2:#e9edf9;--line:rgba(20,26,48,.14);--txt:#141a30;--mut:#48557a;--dim:#7d89a6;--amber:#d99a00;--teal:#0d9488;--blue:#2563eb}
+html[data-theme="light"] header{background:linear-gradient(135deg,#e6ebff 0%,#fdeed3 55%,#f4f6fc 100%)}
+html[data-theme="light"] .controls{background:rgba(244,246,252,.94)}
+html[data-theme="light"] .val,html[data-theme="light"] .rbox{background:rgba(20,26,48,.05)}
+html[data-theme="light"] .upd{background:rgba(20,26,48,.05)}
+html[data-theme="light"] .m-unk{background:rgba(20,26,48,.06)}
+html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-theme="light"] .fcard{box-shadow:0 1px 5px rgba(20,26,48,.07)}
 </style>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('adm_theme')||'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <button id="authBtn" class="authbtn">🔐 כניסה</button>
-    <h1>דרישות סף <span class="ac">לאקדמיה</span></h1>
+    <div class="topbar"><button id="themeBtn" class="themebtn" title="מעבר בין תצוגת יום לתצוגת לילה">🌞</button><button id="authBtn" class="authbtn">🔐 כניסה</button></div>
+    <h1>תואר<span class="ac">נט</span></h1>
     <p>תנאי קבלה מעודכנים לתואר ראשון - בכל אוניברסיטה ומכללה בישראל</p>
     <span class="upd" id="upd">טוען נתונים…</span>
   </div>
@@ -298,7 +311,7 @@ async function init(){
     $('inPsy').value=''; $('inBag').value=''; syncBtn(); panel.classList.remove('open'); refreshView();
   });
   document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click', ()=>{ if(!USER){ openAuth(); return; } showFeatView(b.dataset.v); }));
-  bindAuth(); initAuth();
+  bindAuth(); initAuth(); bindTheme();
 }
 function refreshView(){
   const sel = $('instSel').value;
@@ -580,7 +593,7 @@ function buildCmp(){
     const names = new Set();
     DATA.institutions.forEach(i=>(i.degrees || []).forEach(d=>{ if(d.name.toLowerCase().includes(q)) names.add(d.name); }));
     box.innerHTML = [...names].slice(0, 20).map(n=>`<div class="res-item" data-cn="${escA(n)}">${n}</div>`).join('') || '<div class="empty">לא נמצא תואר מתאים</div>';
-    box.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click', ()=>renderCmp(el.dataset.cn)));
+    box.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click', ()=>{ $('cmpQ').value = el.dataset.cn; renderCmp(el.dataset.cn); }));
   });
 }
 function renderCmp(name){
@@ -607,6 +620,19 @@ function buildFav(){
   else groups.forEach(g=>{ h += `<div class="res-group"><h3>${g.i.name}</h3><div class="deg">${g.ds.map(d=>dcard(d, g.i.id)).join('')}</div></div>`; });
   v.innerHTML = h;
   bindStars(v);
+}
+function syncTheme(){
+  const b = $('themeBtn'); if(!b) return;
+  b.textContent = document.documentElement.dataset.theme === 'light' ? '🌚' : '🌞';
+}
+function bindTheme(){
+  syncTheme();
+  $('themeBtn').addEventListener('click', ()=>{
+    const t = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+    try{ localStorage.setItem('adm_theme', t); }catch(e){}
+    syncTheme();
+  });
 }
 init();
 </script>
