@@ -482,8 +482,11 @@ function setUser(u){
   } else {
     b.textContent = '🔐 כניסה';
     $('featBar').classList.remove('open');
-    FAVS = new Set(); hideFeatViews();
-    if($('instView').style.display !== 'none') refreshView();
+    FAVS = new Set();
+    const wasFeat = curFeat !== null;
+    hideFeatViews();
+    if(wasFeat) goHome();
+    else if($('instView').style.display !== 'none') refreshView();
   }
 }
 function hideFeatViews(){
