@@ -90,7 +90,8 @@ header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 
 
 .deg{display:grid;grid-template-columns:1fr;gap:10px}
-.dcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.dcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:border-color .3s,box-shadow .3s}
+.dcard.hl{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,207,0,.4)}
 .dcard .t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
 .dcard h4{font-size:16.5px;font-weight:800;line-height:1.45;flex:1;min-width:200px}
 .tt{font-size:12px;font-weight:700;color:var(--blue);background:rgba(47,127,224,.13);border:1px solid rgba(47,127,224,.3);padding:3px 10px;border-radius:999px;white-space:nowrap}
@@ -158,7 +159,16 @@ table.ct th{color:var(--dim);font-weight:700;font-size:13px}
 .tuit{font-size:13.5px;color:var(--teal);font-weight:700;margin-top:6px}
 .calcres{background:rgba(255,207,0,.07);border:1px solid rgba(255,207,0,.35);border-radius:14px;padding:16px;margin-top:14px}
 .calcres .big{font-size:32px;font-weight:900;color:var(--amber)}
+.blockline{font-size:13.5px;color:#ff8a8a;font-weight:700;margin-top:10px}
+html[data-theme="light"] .blockline{color:#c62828}
 .calcres .det{font-size:13.5px;color:var(--mut);margin-top:6px}
+.brow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.brow select,.brow input{padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:15px}
+.brow .bgrade{width:92px}
+.bmand{font-size:13px;color:var(--mut);display:flex;gap:5px;align-items:center;cursor:pointer}
+.bmand input{width:16px;height:16px;accent-color:var(--amber)}
+.bdel{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
+.bdel:hover{border-color:#ff8a8a;color:#ff8a8a}
 .topbar{position:absolute;top:16px;left:16px;z-index:5;display:flex;gap:8px;align-items:center}
 .themebtn{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--panel2);font-size:18px;cursor:pointer;line-height:1;padding:0}
 .themebtn:hover{border-color:var(--amber)}
@@ -206,9 +216,13 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
   <div class="wrap">
     <div class="fld"><label>ציון פסיכומטרי</label><input id="inPsy" type="number" min="200" max="800" placeholder="למשל 620"></div>
     <div class="fld"><label>ממוצע בגרות</label><input id="inBag" type="number" min="0" max="120" step="0.1" placeholder="למשל 95"></div>
+    <div class="fld"><label>יחידות מתמטיקה (אופציונלי)</label><input id="inMu" type="number" min="3" max="5" placeholder="4"></div>
+    <div class="fld"><label>ציון מתמטיקה</label><input id="inMg" type="number" min="0" max="100" placeholder="85"></div>
+    <div class="fld"><label>יחידות אנגלית (אופציונלי)</label><input id="inEu" type="number" min="3" max="5" placeholder="4"></div>
+    <div class="fld"><label>ציון אנגלית</label><input id="inEg" type="number" min="0" max="100" placeholder="85"></div>
     <button class="pbtn save" id="saveMy">שמור</button>
     <button class="pbtn clear" id="clearMy">נקה</button>
-    <span style="font-size:12.5px;color:var(--dim)">נשמר רק בדפדפן שלך • האתר יציג התאמה לכל תואר</span>
+    <span style="font-size:12.5px;color:var(--dim)">נשמר בדפדפן, ולמשתמשים מחוברים - גם בחשבון • מתמטיקה ואנגלית אופציונליים, ומשמשים לסינון תארים שחסומים עבורך</span>
   </div>
 </div>
 
@@ -257,12 +271,26 @@ const fmt = n => (n==null ? null : (Math.round(n*10)/10));
 
 let MY = null, onlyMine = false;
 try{ MY = JSON.parse(localStorage.getItem('adm_my')||'null'); }catch(e){ MY = null; }
+function subjBlock(d){
+  if(!MY || !d.subj) return [];
+  const s = d.subj, out = [];
+  if(s.math_units != null && MY.mu != null){
+    if(MY.mu < s.math_units) out.push('נדרשת מתמטיקה ' + s.math_units + ' יח״ל, לך יש ' + MY.mu);
+    else if(MY.mu === s.math_units && s.math_grade != null && MY.mg != null && MY.mg < s.math_grade) out.push('נדרש ציון ' + s.math_grade + ' במתמטיקה, לך יש ' + MY.mg);
+  }
+  if(s.eng_units != null && MY.eu != null){
+    if(MY.eu < s.eng_units) out.push('נדרשת אנגלית ' + s.eng_units + ' יח״ל, לך יש ' + MY.eu);
+    else if(MY.eu === s.eng_units && s.eng_grade != null && MY.eg != null && MY.eg < s.eng_grade) out.push('נדרש ציון ' + s.eng_grade + ' באנגלית, לך יש ' + MY.eg);
+  }
+  return out;
+}
 function matchOf(d){
   if(!MY) return null;
   const p = d.psychometric, b = d.bagrut;
-  if(p==null && b==null) return 'unk';
+  if(p==null && b==null) return subjBlock(d).length ? 'no' : 'unk';
   if(p!=null && (MY.psy==null || MY.psy < p)) return 'no';
   if(b!=null && (MY.bag==null || MY.bag < b)) return 'no';
+  if(subjBlock(d).length) return 'no';
   return 'ok';
 }
 const MBADGE = {ok:'<span class="mbadge m-ok">✅ עומד בדרישות</span>',
@@ -299,12 +327,12 @@ async function init(){
   const panel = $('myPanel'), btn = $('myBtn');
   const syncBtn = ()=>{ btn.classList.toggle('on', !!MY); btn.textContent = MY ? '🎯 הציונים שלי ✓' : '🎯 הציונים שלי'; };
   syncBtn();
-  if(MY){ $('inPsy').value = MY.psy??''; $('inBag').value = MY.bag??''; }
+  if(MY){ $('inPsy').value = MY.psy??''; $('inBag').value = MY.bag??''; $('inMu').value = MY.mu??''; $('inMg').value = MY.mg??''; $('inEu').value = MY.eu??''; $('inEg').value = MY.eg??''; }
   btn.addEventListener('click', ()=>panel.classList.toggle('open'));
   $('saveMy').addEventListener('click', ()=>{
-    const psy = parseFloat($('inPsy').value), bag = parseFloat($('inBag').value);
-    MY = {psy: isNaN(psy)?null:psy, bag: isNaN(bag)?null:bag};
-    if(MY.psy==null && MY.bag==null){ MY = null; localStorage.removeItem('adm_my'); }
+    const num = id => { const v = parseFloat($(id).value); return isNaN(v) ? null : v; };
+    MY = {psy: num('inPsy'), bag: num('inBag'), mu: num('inMu'), mg: num('inMg'), eu: num('inEu'), eg: num('inEg')};
+    if(MY.psy==null && MY.bag==null && MY.mu==null && MY.mg==null && MY.eu==null && MY.eg==null){ MY = null; localStorage.removeItem('adm_my'); }
     else localStorage.setItem('adm_my', JSON.stringify(MY));
     pushMyScores();
     syncBtn(); panel.classList.remove('open'); refreshView();
@@ -312,7 +340,7 @@ async function init(){
   $('clearMy').addEventListener('click', ()=>{
     MY = null; onlyMine = false; localStorage.removeItem('adm_my');
     pushMyScores();
-    $('inPsy').value=''; $('inBag').value=''; syncBtn(); panel.classList.remove('open'); refreshView();
+    $('inPsy').value=''; $('inBag').value=''; $('inMu').value=''; $('inMg').value=''; $('inEu').value=''; $('inEg').value=''; syncBtn(); panel.classList.remove('open'); refreshView();
   });
   document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click', ()=>{ if(!USER){ openAuth(); return; } showFeatView(b.dataset.v); }));
   bindAuth(); initAuth(); bindTheme(); countView();
@@ -407,13 +435,15 @@ function degListHtml(degs, instId){
 function dcard(d, instId){
   const pv = fmt(d.psychometric), bv = fmt(d.bagrut);
   const m = matchOf(d);
+  const blk = subjBlock(d);
   const star = USER ? `<button class="star ${FAVS.has(favKey(instId, d.name))?'on':''}" data-fi="${instId}" data-fd="${escA(d.name)}" title="הוספה למועדפים">★</button>` : '';
-  return `<div class="dcard">
+  return `<div class="dcard" data-dname="${escA(d.name)}">
     <div class="t"><h4>${d.name}</h4>${d.title?`<span class="tt">${d.title}</span>`:''}${star}${m?MBADGE[m]:''}</div>
     <div class="vals">
       <div class="val ${pv==null?'na':''}"><div class="l">פסיכומטרי</div><div class="n">${pv==null?'לא פורסם':pv}</div></div>
       <div class="val ${bv==null?'na':''}"><div class="l">ממוצע בגרות</div><div class="n">${bv==null?'לא פורסם':bv}</div></div>
     </div>
+    ${blk.length?`<div class="blockline">🚫 חסום עבורך: ${blk.join(' • ')}</div>`:''}
     ${d.notes?`<div class="notes">${d.notes}</div>`:''}
   </div>`;
 }
@@ -437,12 +467,19 @@ function onSearch(e){
     if(im || dm.length){
       h += `<div class="res-group"><h3>${i.name}</h3>`;
       if(im && !dm.length) h += `<div class="res-item" data-id="${i.id}">פתיחת דף המוסד<small>${(i.degrees||[]).length} תארים</small></div>`;
-      dm.forEach(d=>{ h += `<div class="res-item" data-id="${i.id}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'-'} • בגרות: ${fmt(d.bagrut)??'-'}</small></div>`; });
+      dm.forEach(d=>{ h += `<div class="res-item" data-id="${i.id}" data-deg="${escA(d.name)}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'-'} • בגרות: ${fmt(d.bagrut)??'-'}</small></div>`; });
       h += '</div>';
     }
   });
   R.innerHTML = h || '<div class="empty">לא נמצאו תוצאות</div>';
-  R.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click',()=>{ $('q').value=''; showInst(el.dataset.id); }));
+  R.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click',()=>{
+    const deg = el.dataset.deg;
+    $('q').value='';
+    if(deg){
+      window._noTopScroll = true; showInst(el.dataset.id); window._noTopScroll = false;
+      jumpToDegree(deg);
+    } else showInst(el.dataset.id);
+  }));
 }
 function openAuth(){ if(!SB){ alert('שירות הכניסה אינו זמין כרגע'); return; } $('authModal').classList.add('open'); }
 function closeAuth(){ const m = $('authModal'); if(!m) return; m.classList.remove('open'); $('stepCode').style.display='none'; $('stepMain').style.display='block'; }
@@ -485,6 +522,7 @@ function setUser(u){
     if(mb){ mb.classList.remove('on'); mb.textContent = '🎯 הציונים שלי'; }
     const ip = $('inPsy'), ib = $('inBag');
     if(ip) ip.value = ''; if(ib) ib.value = '';
+    ['inMu','inMg','inEu','inEg'].forEach(id=>{ const el = $(id); if(el) el.value = ''; });
     const wasFeat = curFeat !== null;
     hideFeatViews();
     if(wasFeat) goHome();
@@ -517,6 +555,13 @@ async function loadFavs(){
     (data || []).forEach(r=>FAVS.add(favKey(r.institution, r.degree)));
   }catch(e){}
 }
+function jumpToDegree(name){
+  const el = [...document.querySelectorAll('#degList .dcard')].find(c=>c.dataset.dname === name);
+  if(!el) return;
+  el.scrollIntoView({block: 'center', behavior: 'smooth'});
+  el.classList.add('hl');
+  setTimeout(()=>el.classList.remove('hl'), 2800);
+}
 function bindStars(root){
   (root || document).querySelectorAll('.star').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); toggleFav(b.dataset.fi, b.dataset.fd); }));
 }
@@ -537,23 +582,28 @@ async function toggleFav(instId, dname){
 async function loadMyScores(){
   if(!USER || !SB) return;
   try{
-    const {data} = await SB.from('user_scores').select('psy, bag').eq('user_id', USER.id).maybeSingle();
-    if(data && (data.psy != null || data.bag != null)){
-      MY = {psy: data.psy != null ? Number(data.psy) : null, bag: data.bag != null ? Number(data.bag) : null};
+    const {data} = await SB.from('user_scores').select('psy, bag, math_units, math_grade, eng_units, eng_grade').eq('user_id', USER.id).maybeSingle();
+    const has = data && (data.psy != null || data.bag != null || data.math_units != null || data.eng_units != null);
+    if(has){
+      MY = {psy: data.psy != null ? Number(data.psy) : null, bag: data.bag != null ? Number(data.bag) : null,
+        mu: data.math_units != null ? Number(data.math_units) : null, mg: data.math_grade != null ? Number(data.math_grade) : null,
+        eu: data.eng_units != null ? Number(data.eng_units) : null, eg: data.eng_grade != null ? Number(data.eng_grade) : null};
       try{ localStorage.setItem('adm_my', JSON.stringify(MY)); }catch(e){}
       const b = $('myBtn');
       if(b){ b.classList.toggle('on', true); b.textContent = '🎯 הציונים שלי ✓'; }
       $('inPsy').value = MY.psy ?? ''; $('inBag').value = MY.bag ?? '';
+      $('inMu').value = MY.mu ?? ''; $('inMg').value = MY.mg ?? '';
+      $('inEu').value = MY.eu ?? ''; $('inEg').value = MY.eg ?? '';
       refreshView();
     } else if(MY){
-      await SB.from('user_scores').upsert({user_id: USER.id, psy: MY.psy, bag: MY.bag, updated_at: new Date().toISOString()});
+      await pushMyScores();
     }
   }catch(e){}
 }
 async function pushMyScores(){
   if(!USER || !SB) return;
   try{
-    if(MY) await SB.from('user_scores').upsert({user_id: USER.id, psy: MY.psy, bag: MY.bag, updated_at: new Date().toISOString()});
+    if(MY) await SB.from('user_scores').upsert({user_id: USER.id, psy: MY.psy, bag: MY.bag, math_units: MY.mu ?? null, math_grade: MY.mg ?? null, eng_units: MY.eu ?? null, eng_grade: MY.eg ?? null, updated_at: new Date().toISOString()});
     else await SB.from('user_scores').delete().eq('user_id', USER.id);
   }catch(e){}
 }
@@ -594,7 +644,12 @@ function buildCalc(){
   const v = $('calcView');
   const opts = DATA.institutions.map(i=>`<option value="${i.id}">${i.name}</option>`).join('');
   v.innerHTML = `<button class="back" onclick="goHome()">→ חזרה לכל המוסדות</button>
-  <div class="sec-t">🧮 מחשבון סכם</div>
+  <div class="sec-t">🧮 מחשבונים</div>
+  <div class="pills" style="margin:0 0 14px">
+    <button class="pill active" id="tabSechem">ציון סכם / התאמה</button>
+    <button class="pill" id="tabBag">ממוצע בגרות משוקלל</button>
+  </div>
+  <div id="sechemPane">
   <div class="fcard">
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
       <div class="fld"><label>מוסד</label><select id="calcInst" style="padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px">${opts}</select></div>
@@ -604,8 +659,120 @@ function buildCalc(){
     </div>
     <div id="calcOut"></div>
     <div class="locknote">החישוב מבוסס על נוסחאות שפרסמו המוסדות באתריהם הרשמיים. כשמצוין "הערכה" - הנוסחה המלאה קיימת רק במחשבון הרשמי של המוסד.</div>
+  </div>
+  </div>
+  <div id="bagPane" style="display:none">
+  <div class="fcard">
+    <div class="fld" style="margin-bottom:12px"><label>מוסד (קובע את שיטת הבונוסים)</label><select id="bagInst" style="padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px">${opts}</select></div>
+    <div style="font-size:13.5px;color:var(--mut);margin-bottom:10px">הזן את מקצועות הבגרות שלך. מקצועות חובה לא יושמטו בחישוב האופטימלי; מקצועות בחירה שמורידים את הממוצע יושמטו אוטומטית, כל עוד נשארות לפחות 20 יחידות לימוד.</div>
+    <div id="bagRows"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+      <button class="pbtn clear" id="addRow">+ הוסף מקצוע</button>
+      <button class="pbtn save" id="bagGo">חשב ממוצע</button>
+    </div>
+    <div id="bagOut"></div>
+    <div class="locknote">שיטות הבונוסים לפי פרסומים רשמיים של המוסדות. כשמצוין "הערכה" - המוסד לא מפרסם שיטה רשמית והחישוב הוא לפי השיטה הסטנדרטית.</div>
+  </div>
   </div>`;
   $('calcGo').addEventListener('click', runCalc);
+  $('tabSechem').addEventListener('click', ()=>switchCalcTab('s'));
+  $('tabBag').addEventListener('click', ()=>switchCalcTab('b'));
+  $('addRow').addEventListener('click', ()=>addBagRow('other', false));
+  $('bagGo').addEventListener('click', runBag);
+  addBagRow('math', true); addBagRow('eng', true);
+  addBagRow('other', false); addBagRow('other', false); addBagRow('other', false);
+  addBagRow('other', false); addBagRow('other', false); addBagRow('other', false);
+}
+function switchCalcTab(t){
+  $('sechemPane').style.display = t === 's' ? 'block' : 'none';
+  $('bagPane').style.display = t === 'b' ? 'block' : 'none';
+  $('tabSechem').classList.toggle('active', t === 's');
+  $('tabBag').classList.toggle('active', t === 'b');
+}
+const BAGP = {
+  tau: {exact: true, label: 'לפי הידיעון הרשמי של אוניברסיטת תל אביב', minG: 60, b: {'5': {math: 20, eng: 25, sci: 25, hum: 25, rel: 25, other: 20}, '4': {math: 12.5, eng: 12.5, sci: 10, hum: 10, rel: 10, other: 10}}},
+  technion: {exact: true, label: 'לפי ידיעון הטכניון (לא כולל ארכיטקטורה ואדריכלות נוף)', mathDouble: true, cap: 119, note: 'יחידות המתמטיקה נספרות במשקל כפול. בונוס קומבו מדעי-טכנולוגי מיוחד אינו מחושב כאן.', b: {'5': {math: 30, eng: 25, sci: 25, hum: 25, rel: 25, other: 25}, '4': {math: 10, eng: 10, sci: 10, hum: 10, rel: 10, other: 10}}},
+  bgu: {exact: true, label: 'לפי ידיעון אוניברסיטת בן-גוריון בנגב', minG: 61, cap: 120, b: {'5': {math: 35, eng: 25, sci: 25, hum: 20, rel: 20, other: 20}, '4': {math: 20, eng: 15, sci: 10, hum: 10, rel: 10, other: 10}}},
+  biu: {exact: true, label: 'לפי ידיעון אוניברסיטת בר-אילן', b: {'5': {math: 35, eng: 25, sci: 20, hum: 20, rel: 25, other: 20}, '4': {math: 12.5, eng: 12.5, sci: 10, hum: 10, rel: 12.5, other: 10}}},
+  haifa: {exact: true, label: 'לפי ידיעון אוניברסיטת חיפה', b: {'5': {math: 35, eng: 25, sci: 25, hum: 25, rel: 25, other: 20}, '4': {math: 20, eng: 20, sci: 20, hum: 20, rel: 20, other: 10}}},
+  yvc: {exact: true, label: 'המכללה האקדמית עמק יזרעאל - ממוצע גולמי ללא בונוסים כלל, לפי האתר הרשמי', b: {'5': {math: 0, eng: 0, sci: 0, hum: 0, rel: 0, other: 0}, '4': {math: 0, eng: 0, sci: 0, hum: 0, rel: 0, other: 0}}}
+};
+function bagProfile(inst){
+  if(inst.id === 'open') return {none: true, det: 'האוניברסיטה הפתוחה אינה משתמשת בממוצע בגרות כלל - הקבלה פתוחה לכולם, בלי תנאי סף.'};
+  const p = BAGP[inst.id];
+  if(p) return p;
+  return {exact: false, label: 'הערכה לפי השיטה הסטנדרטית (25 נקודות ב-5 יח״ל, 12.5 ב-4 יח״ל)', b: {'5': {math: 25, eng: 25, sci: 25, hum: 25, rel: 25, other: 25}, '4': {math: 12.5, eng: 12.5, sci: 12.5, hum: 12.5, rel: 12.5, other: 12.5}}};
+}
+function bonusOf(p, units, cat, grade){
+  if(units < 4) return 0;
+  if(p.minG && grade < p.minG) return 0;
+  const t = p.b[String(units)];
+  return t ? (t[cat] != null ? t[cat] : (t.other || 0)) : 0;
+}
+function addBagRow(cat, mand){
+  const box = $('bagRows'); if(!box) return;
+  const div = document.createElement('div'); div.className = 'brow';
+  div.innerHTML = `<select class="bcat">
+      <option value="other">מקצוע אחר</option>
+      <option value="math">מתמטיקה</option>
+      <option value="eng">אנגלית</option>
+      <option value="sci">מדעים (פיזיקה/כימיה/ביולוגיה)</option>
+      <option value="hum">הומניסטיקה (היסטוריה/ספרות/תנ״ך)</option>
+      <option value="rel">מקצועות קודש (תלמוד/תושב״ע/מחשבת)</option>
+    </select>
+    <select class="bunits"><option value="1">1 יח״ל</option><option value="2">2 יח״ל</option><option value="3">3 יח״ל</option><option value="4">4 יח״ל</option><option value="5" selected>5 יח״ל</option></select>
+    <input class="bgrade" type="number" min="0" max="100" placeholder="ציון">
+    <label class="bmand"><input type="checkbox" ${mand ? 'checked' : ''}> חובה</label>
+    <button class="bdel" title="הסרת מקצוע">✕</button>`;
+  div.querySelector('.bcat').value = cat || 'other';
+  div.querySelector('.bdel').addEventListener('click', ()=>div.remove());
+  box.appendChild(div);
+}
+function runBag(){
+  const inst = DATA.institutions.find(x=>x.id === $('bagInst').value); if(!inst) return;
+  const p = bagProfile(inst);
+  const out = $('bagOut');
+  if(p.none){ out.innerHTML = `<div class="calcres"><div class="det">${p.det}</div></div>`; return; }
+  const rows = [...document.querySelectorAll('#bagRows .brow')].map(r=>{
+    const grade = parseFloat(r.querySelector('.bgrade').value);
+    return {cat: r.querySelector('.bcat').value, units: parseInt(r.querySelector('.bunits').value), grade: isNaN(grade) ? null : grade, mand: r.querySelector('.bmand input').checked};
+  }).filter(r=>r.grade != null && r.units > 0);
+  if(rows.length < 3){ out.innerHTML = `<div class="calcres"><div class="det">הזן לפחות 3 מקצועות עם ציונים</div></div>`; return; }
+  const eff = r => r.grade + bonusOf(p, r.units, r.cat, r.grade);
+  const wOf = r => (p.mathDouble && r.cat === 'math') ? r.units * 2 : r.units;
+  const avgOf = list => { let s = 0, w = 0; list.forEach(r=>{ s += eff(r) * wOf(r); w += wOf(r); }); return w ? s / w : 0; };
+  let chosen = rows.slice();
+  const totalU = () => chosen.reduce((n,r)=>n + r.units, 0);
+  const dropped = [];
+  let improved = true;
+  while(improved){
+    improved = false;
+    let best = null;
+    chosen.forEach((r, idx)=>{
+      if(r.mand) return;
+      if(totalU() - r.units < 20) return;
+      const rest = chosen.filter((_, j)=>j !== idx);
+      const a = avgOf(rest);
+      if(!best || a > best.a) best = {idx, a};
+    });
+    if(best && best.a > avgOf(chosen) + 1e-9){ dropped.push(chosen[best.idx]); chosen.splice(best.idx, 1); improved = true; }
+  }
+  let avg = avgOf(chosen);
+  if(p.cap) avg = Math.min(avg, p.cap);
+  avg = Math.round(avg * 10) / 10;
+  const catName = {math: 'מתמטיקה', eng: 'אנגלית', sci: 'מדעים', hum: 'הומניסטיקה', rel: 'מקצועות קודש', other: 'אחר'};
+  out.innerHTML = `<div class="calcres"><div style="font-size:14px;color:var(--mut)">${inst.name} - ממוצע הבגרות המשוקלל שלך</div><div class="big">${avg}</div>
+  <div class="det">${p.label}${p.exact ? '' : ' • הערכה'}${p.note ? '<br>' + p.note : ''}<br>נכללו ${chosen.length} מקצועות, ${totalU()} יחידות לימוד${dropped.length ? '<br>הושמטו בחישוב האופטימלי: ' + dropped.map(r=>catName[r.cat]).join(', ') : ''}</div>
+  <button class="pbtn save" id="useBagAvg" style="margin-top:12px">השתמש בממוצע הזה בציונים שלי</button></div>`;
+  $('useBagAvg').addEventListener('click', ()=>{
+    if(!MY) MY = {psy: null, bag: null, mu: null, mg: null, eu: null, eg: null};
+    MY.bag = avg;
+    try{ localStorage.setItem('adm_my', JSON.stringify(MY)); }catch(e){}
+    $('inBag').value = avg;
+    const b = $('myBtn'); if(b){ b.classList.add('on'); b.textContent = '🎯 הציונים שלי ✓'; }
+    pushMyScores(); refreshView();
+    $('useBagAvg').textContent = '✓ נשמר בציונים שלי';
+  });
 }
 function runCalc(){
   const i = DATA.institutions.find(x=>x.id === $('calcInst').value); if(!i) return;
@@ -646,7 +813,7 @@ function renderCmp(name){
   <div style="overflow-x:auto"><table class="ct"><tr><th>מוסד</th><th>פסיכומטרי</th><th>ממוצע בגרות</th><th>שכר לימוד לשנה</th></tr>
   ${rows.map(r=>`<tr><td><a href="#" data-ci="${r.i.id}" style="color:var(--teal);text-decoration:none;font-weight:700">${r.i.name}</a></td><td>${fmt(r.d.psychometric) ?? 'לא פורסם'}</td><td>${fmt(r.d.bagrut) ?? 'לא פורסם'}</td><td>${tuitText(r.i)}</td></tr>`).join('')}
   </table></div>`;
-  $('cmpOut').querySelectorAll('[data-ci]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); showInst(a.dataset.ci); }));
+  $('cmpOut').querySelectorAll('[data-ci]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); window._noTopScroll = true; showInst(a.dataset.ci); window._noTopScroll = false; jumpToDegree(name); }));
 }
 function buildFav(){
   const v = $('favView');
