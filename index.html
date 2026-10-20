@@ -115,8 +115,10 @@ footer b{color:var(--mut)}
   .val{min-width:calc(50% - 5px);flex:1}
   .controls .wrap{flex-direction:column}
   .search,.pick{min-width:0}
+  header .wrap{display:flex;flex-direction:column}
+  .authbtn{position:static;align-self:flex-end;order:-1;margin-bottom:12px;max-width:75vw}
 }
-.authbtn{margin-inline-start:auto;padding:12px 18px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap}
+.authbtn{position:absolute;top:16px;left:16px;z-index:5;max-width:320px;overflow:hidden;text-overflow:ellipsis;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap}
 .authbtn:hover{border-color:var(--teal)}
 .featbar{display:none;border-bottom:1px solid var(--line);background:var(--panel);padding:10px 0}
 .featbar.open{display:block}
@@ -132,12 +134,15 @@ footer b{color:var(--mut)}
 .modal input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px;margin-bottom:10px;outline:none}
 .modal input:focus{border-color:var(--amber)}
 .mclose{float:left;background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer}
-.gbtn{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#111;font-family:inherit;font-size:15.5px;font-weight:800;cursor:pointer;margin-bottom:10px}
+.gbtn{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#111;font-family:inherit;font-size:15.5px;font-weight:800;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px}
+.gbtn svg{width:18px;height:18px;flex:none}
 .sep{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:13px;margin:12px 0}
 .sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--line)}
 .abtn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--amber);color:#111;font-family:inherit;font-size:15.5px;font-weight:800;cursor:pointer}
 .abtn:hover{filter:brightness(1.08)}
 .otpcode{letter-spacing:6px;text-align:center;font-size:22px;font-weight:800}
+#authEmail{direction:ltr;text-align:left}
+#authEmail:placeholder-shown{text-align:right}
 .fcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
 .fcard h3{font-size:18px;font-weight:900;margin-bottom:12px}
 table.ct{width:100%;border-collapse:collapse;font-size:14.5px}
@@ -155,6 +160,7 @@ table.ct th{color:var(--dim);font-weight:700;font-size:13px}
 <body>
 <header>
   <div class="wrap">
+    <button id="authBtn" class="authbtn">🔐 כניסה</button>
     <h1>דרישות סף <span class="ac">לאקדמיה</span></h1>
     <p>תנאי קבלה מעודכנים לתואר ראשון - בכל אוניברסיטה ומכללה בישראל</p>
     <span class="upd" id="upd">טוען נתונים…</span>
@@ -171,7 +177,6 @@ table.ct th{color:var(--dim);font-weight:700;font-size:13px}
       <select id="instSel"><option value="">בחירה מרשימה - כל המוסדות…</option></select>
     </div>
     <button id="myBtn" class="mybtn">🎯 הציונים שלי</button>
-    <button id="authBtn" class="authbtn">🔐 כניסה</button>
   </div>
 </div>
 <div class="featbar" id="featBar">
@@ -206,9 +211,9 @@ table.ct th{color:var(--dim);font-weight:700;font-size:13px}
     <h3>כניסה לאתר</h3>
     <p id="authMsg">התכונות המתקדמות - מחשבון סכם, השוואת מוסדות, מועדפים ושכר לימוד - זמינות למשתמשים רשומים בלבד.</p>
     <div id="stepMain">
-      <button class="gbtn" id="gLogin">כניסה עם Google</button>
+      <button class="gbtn" id="gLogin"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>כניסה עם Google</button>
       <div class="sep">או</div>
-      <input id="authEmail" type="email" placeholder="כתובת מייל" dir="ltr">
+      <input id="authEmail" type="email" placeholder="כתובת מייל">
       <button class="abtn" id="sendCode">שליחת קוד אימות למייל</button>
     </div>
     <div id="stepCode" style="display:none">
