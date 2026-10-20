@@ -188,6 +188,21 @@ html[data-theme="light"] .blockline{color:#c62828}
 .bdel{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
 .bdel:hover{border-color:#ff8a8a;color:#ff8a8a}
 .topbar{position:absolute;top:16px;left:16px;z-index:5;display:flex;gap:8px;align-items:center}
+.langwrap{position:relative}
+.langmenu{position:absolute;top:calc(100% + 8px);left:0;background:var(--panel2);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:160px;z-index:90;box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.langmenu button{display:block;width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid var(--line);color:var(--txt);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;text-align:right}
+.langmenu button:last-child{border-bottom:none}
+.langmenu button:hover{background:var(--bg)}
+html[dir="ltr"] .topbar{left:auto;right:16px}
+html[dir="ltr"] .langmenu{left:auto;right:0}
+html[dir="ltr"] .langmenu button{text-align:left}
+html[dir="ltr"] .search .ic{right:auto;left:14px}
+html[dir="ltr"] .search input{padding:12px 14px 12px 44px}
+html[dir="ltr"] .sugg{text-align:left}
+html[dir="ltr"] .qz-opt{text-align:left}
+html[dir="ltr"] table.ct th,html[dir="ltr"] table.ct td{text-align:left}
+html[dir="ltr"] .mclose{float:right}
+html[dir="ltr"] #authEmail:placeholder-shown{text-align:left}
 .themebtn{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--panel2);font-size:18px;cursor:pointer;line-height:1;padding:0}
 .themebtn:hover{border-color:var(--amber)}
 html[data-theme="light"]{--bg:#f4f6fc;--panel:#ffffff;--panel2:#e9edf9;--line:rgba(20,26,48,.14);--txt:#141a30;--mut:#48557a;--dim:#7d89a6;--amber:#d99a00;--teal:#0d9488;--blue:#2563eb}
@@ -199,13 +214,14 @@ html[data-theme="light"] .m-unk{background:rgba(20,26,48,.06)}
 html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-theme="light"] .fcard{box-shadow:0 1px 5px rgba(20,26,48,.07)}
 </style>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('adm_theme')||'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
+<script>try{var L0=localStorage.getItem('adm_lang')||'he';document.documentElement.lang=L0;document.documentElement.dir=(L0==='he'||L0==='ar')?'rtl':'ltr'}catch(e){}</script>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <div class="topbar"><button id="themeBtn" class="themebtn" title="מעבר בין תצוגת יום לתצוגת לילה">🌞</button><button id="authBtn" class="authbtn">🔐 כניסה</button></div>
+    <div class="topbar"><button id="themeBtn" class="themebtn" title="מעבר בין תצוגת יום לתצוגת לילה">🌞</button><div class="langwrap"><button id="langBtn" class="themebtn" title="שינוי שפה">🌎</button><div id="langMenu" class="langmenu" style="display:none"></div></div><button id="authBtn" class="authbtn">🔐 כניסה</button></div>
     <h1>תואר<span class="ac">נט</span></h1>
-    <p>תנאי קבלה מעודכנים לתואר ראשון - בכל אוניברסיטה ומכללה בישראל</p>
+    <p id="tagline">תנאי קבלה מעודכנים לתואר ראשון - בכל אוניברסיטה ומכללה בישראל</p>
     <span class="upd" id="upd">טוען נתונים…</span>
   </div>
 </header>
@@ -214,7 +230,7 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
   <div class="wrap">
     <div class="search">
       <span class="ic">🔍</span>
-      <input id="q" type="search" placeholder="חיפוש מדויק - שם תואר או מוסד…" autocomplete="off">
+      <input id="q" type="search" placeholder="חיפוש מדויק - שם תואר או מוסד…" autocomplete="off" data-kph="searchPh">
       <div id="sugg" class="sugg" style="display:none"></div>
     </div>
     <div class="pick">
@@ -225,24 +241,24 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
 </div>
 <div class="featbar locked" id="featBar">
   <div class="wrap">
-    <button class="fbtn" data-v="calc">🧮 מחשבון סכם ובגרות</button>
-    <button class="fbtn" data-v="cmp">⚖️ השוואת מוסדות</button>
-    <button class="fbtn" data-v="fav">⭐ מועדפים</button>
-    <button class="fbtn" data-v="quiz">🧭 איזה תואר מתאים לי</button>
-    <span class="feathint">למשתמשים רשומים בלבד • ההרשמה חינמית</span>
+    <button class="fbtn" data-v="calc" data-k="featCalc">🧮 מחשבון סכם ובגרות</button>
+    <button class="fbtn" data-v="cmp" data-k="featCmp">⚖️ השוואת מוסדות</button>
+    <button class="fbtn" data-v="fav" data-k="featFav">⭐ מועדפים</button>
+    <button class="fbtn" data-v="quiz" data-k="featQuiz">🧭 איזה תואר מתאים לי</button>
+    <span class="feathint" data-k="featHint">למשתמשים רשומים בלבד • ההרשמה חינמית</span>
   </div>
 </div>
 <div id="myPanel">
   <div class="wrap">
-    <div class="fld"><label>ציון פסיכומטרי</label><input id="inPsy" type="number" min="200" max="800" placeholder="למשל 620"></div>
-    <div class="fld"><label>ממוצע בגרות</label><input id="inBag" type="number" min="0" max="120" step="0.1" placeholder="למשל 95"></div>
-    <div class="fld"><label>יחידות מתמטיקה (אופציונלי)</label><input id="inMu" type="number" min="3" max="5" placeholder="4"></div>
-    <div class="fld"><label>ציון מתמטיקה</label><input id="inMg" type="number" min="0" max="100" placeholder="85"></div>
-    <div class="fld"><label>יחידות אנגלית (אופציונלי)</label><input id="inEu" type="number" min="3" max="5" placeholder="4"></div>
-    <div class="fld"><label>ציון אנגלית</label><input id="inEg" type="number" min="0" max="100" placeholder="85"></div>
-    <button class="pbtn save" id="saveMy">שמור</button>
-    <button class="pbtn clear" id="clearMy">נקה</button>
-    <span style="font-size:12.5px;color:var(--dim)">נשמר בדפדפן, ולמשתמשים מחוברים - גם בחשבון • מתמטיקה ואנגלית אופציונליים, ומשמשים לסינון תארים שחסומים עבורך</span>
+    <div class="fld"><label data-k="lblPsy">ציון פסיכומטרי</label><input id="inPsy" type="number" min="200" max="800" placeholder="למשל 620" data-kph="phEx620"></div>
+    <div class="fld"><label data-k="lblBag">ממוצע בגרות</label><input id="inBag" type="number" min="0" max="120" step="0.1" placeholder="למשל 95" data-kph="phEx95"></div>
+    <div class="fld"><label data-k="lblMu">יחידות מתמטיקה (אופציונלי)</label><input id="inMu" type="number" min="3" max="5" placeholder="4"></div>
+    <div class="fld"><label data-k="lblMg">ציון מתמטיקה</label><input id="inMg" type="number" min="0" max="100" placeholder="85"></div>
+    <div class="fld"><label data-k="lblEu">יחידות אנגלית (אופציונלי)</label><input id="inEu" type="number" min="3" max="5" placeholder="4"></div>
+    <div class="fld"><label data-k="lblEg">ציון אנגלית</label><input id="inEg" type="number" min="0" max="100" placeholder="85"></div>
+    <button class="pbtn save" id="saveMy" data-k="save">שמור</button>
+    <button class="pbtn clear" id="clearMy" data-k="clear">נקה</button>
+    <span style="font-size:12.5px;color:var(--dim)" data-k="myNote">נשמר בדפדפן, ולמשתמשים מחוברים - גם בחשבון • מתמטיקה ואנגלית אופציונליים, ומשמשים לסינון תארים שחסומים עבורך</span>
   </div>
 </div>
 
@@ -259,26 +275,25 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
 <div class="mback" id="authModal">
   <div class="modal">
     <button class="mclose" id="authClose">✕</button>
-    <h3>כניסה לאתר</h3>
-    <p id="authMsg">התכונות המתקדמות - מחשבון סכם ובגרות, השוואת מוסדות, מועדפים, שכר לימוד ושאלון איזה תואר מתאים לי - זמינות למשתמשים רשומים. ההרשמה חינמית ולוקחת חצי דקה.</p>
+    <h3 data-k="authTitle">כניסה לאתר</h3>
+    <p id="authMsg" data-k="authMsg">התכונות המתקדמות - מחשבון סכם ובגרות, השוואת מוסדות, מועדפים, שכר לימוד ושאלון איזה תואר מתאים לי - זמינות למשתמשים רשומים. ההרשמה חינמית ולוקחת חצי דקה.</p>
     <div id="stepMain">
-      <button class="gbtn" id="gLogin"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>כניסה עם Google</button>
-      <div class="sep">או</div>
-      <input id="authEmail" type="email" placeholder="כתובת מייל">
-      <button class="abtn" id="sendCode">שליחת קישור כניסה למייל</button>
+      <button class="gbtn" id="gLogin"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg><span data-k="gLogin">כניסה עם Google</span></button>
+      <div class="sep" data-k="or">או</div>
+      <input id="authEmail" type="email" placeholder="כתובת מייל" data-kph="emailPh">
+      <button class="abtn" id="sendCode" data-k="sendLink">שליחת קישור כניסה למייל</button>
     </div>
     <div id="stepCode" style="display:none">
-      <p>📧 שלחנו קישור כניסה למייל שלך. פתח את המייל ולחץ על הקישור - תחזור לאתר מחובר.</p>
-      <button class="abtn" id="closeAfterSend">הבנתי, סגירה</button>
-      <button class="pbtn clear" id="backToMain" style="width:100%;margin-top:8px">חזרה</button>
+      <p data-k="stepCodeTxt">📧 שלחנו קישור כניסה למייל שלך. פתח את המייל ולחץ על הקישור - תחזור לאתר מחובר.</p>
+      <button class="abtn" id="closeAfterSend" data-k="gotIt">הבנתי, סגירה</button>
+      <button class="pbtn clear" id="backToMain" style="width:100%;margin-top:8px" data-k="back">חזרה</button>
     </div>
   </div>
 </div>
 
 <footer>
   <div class="wrap">
-    <b>שימו לב:</b> האתר מציג תואר ראשון בלבד. הנתונים נאספו מהאתרים הרשמיים של המוסדות ומעודכנים לשנת הנתונים המצוינת ליד כל מוסד.
-    חתכי הקבלה משתנים משנה לשנה ותלויים בביקוש - יש לוודא תמיד מול המוסד עצמו לפני הגשת מועמדות.
+    <b data-k="footerB">שימו לב:</b> <span data-k="footerTxt">האתר מציג תואר ראשון בלבד. הנתונים נאספו מהאתרים הרשמיים של המוסדות ומעודכנים לשנת הנתונים המצוינת ליד כל מוסד. חתכי הקבלה משתנים משנה לשנה ותלויים בביקוש - יש לוודא תמיד מול המוסד עצמו לפני הגשת מועמדות.</span>
   </div>
 </footer>
 
@@ -288,6 +303,22 @@ let DATA = {institutions:[]};
 let typeFilter = 'all';
 const $ = id => document.getElementById(id);
 const fmt = n => (n==null ? null : (Math.round(n*10)/10));
+let LANG = 'he';
+try{ LANG = localStorage.getItem('adm_lang') || 'he'; }catch(e){}
+if(['he','en','ru','fr','ar'].indexOf(LANG) < 0) LANG = 'he';
+const TR = {
+he: {titleTag:"תוארנט | דרישות סף לאקדמיה", tagline:"תנאי קבלה מעודכנים לתואר ראשון - בכל אוניברסיטה ומכללה בישראל", loading:"טוען נתונים…", searchPh:"חיפוש מדויק - שם תואר או מוסד…", pickPh:"בחירה מרשימה - כל המוסדות…", myScores:"🎯 הציונים שלי", myScoresOn:"🎯 הציונים שלי ✓", featCalc:"🧮 מחשבון סכם ובגרות", featCmp:"⚖️ השוואת מוסדות", featFav:"⭐ מועדפים", featQuiz:"🧭 איזה תואר מתאים לי", featHint:"למשתמשים רשומים בלבד • ההרשמה חינמית", lblPsy:"ציון פסיכומטרי", lblBag:"ממוצע בגרות", lblMu:"יחידות מתמטיקה (אופציונלי)", lblMg:"ציון מתמטיקה", lblEu:"יחידות אנגלית (אופציונלי)", lblEg:"ציון אנגלית", phEx620:"למשל 620", phEx95:"למשל 95", save:"שמור", clear:"נקה", myNote:"נשמר בדפדפן, ולמשתמשים מחוברים - גם בחשבון • מתמטיקה ואנגלית אופציונליים, ומשמשים לסינון תארים שחסומים עבורך", authTitle:"כניסה לאתר", authMsg:"התכונות המתקדמות - מחשבון סכם ובגרות, השוואת מוסדות, מועדפים, שכר לימוד ושאלון איזה תואר מתאים לי - זמינות למשתמשים רשומים. ההרשמה חינמית ולוקחת חצי דקה.", gLogin:"כניסה עם Google", or:"או", emailPh:"כתובת מייל", sendLink:"שליחת קישור כניסה למייל", stepCodeTxt:"📧 שלחנו קישור כניסה למייל שלך. פתח את המייל ולחץ על הקישור - תחזור לאתר מחובר.", gotIt:"הבנתי, סגירה", back:"חזרה", login:"🔐 כניסה", logout:"יציאה", connected:"מחובר", footerB:"שימו לב:", footerTxt:"האתר מציג תואר ראשון בלבד. הנתונים נאספו מהאתרים הרשמיים של המוסדות ומעודכנים לשנת הנתונים המצוינת ליד כל מוסד. חתכי הקבלה משתנים משנה לשנה ותלויים בביקוש - יש לוודא תמיד מול המוסד עצמו לפני הגשת מועמדות.", updFmt:"עודכן: {d} • {n} מוסדות", all:"הכל", unis:"אוניברסיטאות", cols:"מכללות", typeUni:"אוניברסיטה", typeCol:"מכללה", degLine:"{n} תארים • נתוני {y}", degShort:"{n} תארים", matchForYou:"🎯 מתאימים לך:", noDataYet:"אין נתונים עדיין", backAll:"${t('backAll')}", rngPsy:"טווח פסיכומטרי (מינימום-מקסימום)", rngBag:"טווח ממוצע בגרות (מינימום-מקסימום)", rngSec:"טווח סכם / התאמה (מינימום-מקסימום)", notPublished:"לא פורסם", degCount:"מספר תארים", dataOf:"נתוני", source:"מקור", officialSite:"האתר הרשמי", allDegrees:"📋 כל התארים ודרישות הסף", onlyMineInst:"הצג רק תארים שמתאימים לי", noMatchEntered:"אין תארים מתאימים עם הנתונים שהזנת", psy:"פסיכומטרי", bagAvg:"ממוצע בגרות", sechemReq:"סכם / התאמה נדרש", blockedForYou:"🚫 חסום עבורך: ", blkMathUnits:"נדרשת מתמטיקה {u} יח״ל, לך יש {m}", blkMathGrade:"נדרש ציון {g} במתמטיקה, לך יש {m}", blkEngUnits:"נדרשת אנגלית {u} יח״ל, לך יש {m}", blkEngGrade:"נדרש ציון {g} באנגלית, לך יש {m}", subjMath:"מתמטיקה", subjEng:"אנגלית", subjUnits:"יח״ל", subjGradeUp:"בציון {g} ומעלה", subjPass:"(ציון עובר)", subjUnknown:"לא ידוע", subjLevel:"רמת", starTitle:"הוספה למועדפים", badgeOk:"✅ עומד בדרישות", badgeNo:"❌ לא עומד בדרישות", badgeUnk:"❓ לא ידוע", openInstPage:"פתיחת דף המוסד", onlyMineSearch:"הצג רק מה שמתאים לציונים שלי", noResults:"לא נמצאו תוצאות", loginUnavailable:"שירות הכניסה אינו זמין כרגע", invalidEmail:"הזן כתובת מייל תקינה", sendError:"שגיאה בשליחה. נסה שוב בעוד רגע.", linkSent:"הקישור נשלח ל-", loadError:"שגיאה בטעינת הנתונים", tuitionLine:"💰 שכר לימוד: {x} ₪ לשנה", calculators:"🧮 מחשבונים", tabSechem:"ציון סכם / התאמה", tabBag:"ממוצע בגרות משוקלל", lblInst:"מוסד", calcBtn:"חשב", calcNote:"החישוב מבוסס על נוסחאות שפרסמו המוסדות באתריהם הרשמיים. כשמצוין \"הערכה\" - הנוסחה המלאה קיימת רק במחשבון הרשמי של המוסד.", bagInstLbl:"מוסד (קובע את שיטת הבונוסים)", bagIntro:"הזן את מקצועות הבגרות שלך. מקצועות חובה לא יושמטו בחישוב האופטימלי; מקצועות בחירה שמורידים את הממוצע יושמטו אוטומטית, כל עוד נשארות לפחות 20 יחידות לימוד.", addSubject:"+ הוסף מקצוע", calcAvg:"חשב ממוצע", bagNote:"שיטות הבונוסים לפי פרסומים רשמיים של המוסדות. כשמצוין \"הערכה\" - המוסד לא מפרסם שיטה רשמית והחישוב הוא לפי השיטה הסטנדרטית.", unitsWord:"יח״ל", mand:"חובה", removeTitle:"הסרת מקצוע", gradePh:"ציון", bagMinSubjects:"הזן לפחות 3 מקצועות עם ציונים", weightedOf:"{name} - ממוצע הבגרות המשוקלל שלך", estimateWord:"הערכה", includedLine:"נכללו {n} מקצועות, {u} יחידות לימוד", droppedLine:"הושמטו בחישוב האופטימלי: {list}", useAvg:"השתמש בממוצע הזה בציונים שלי", savedToScores:"✓ נשמר בציונים שלי", yourSehem:"{name} - הסכם שלך", officialFormula:"לפי הנוסחה הרשמית", errPsy:"דרוש ציון פסיכומטרי לחישוב", errBag:"דרוש גם ממוצע בגרות לחישוב", scaleHuji:"ציון משוקלל, סולם 10-30 בקירוב", detHuji:"לפי הנוסחה הרשמית של האוניברסיטה העברית: תקנון בגרות (הממוצע בסולם 11.52) ותקנון פסיכומטרי, בשקלול 30% בגרות ו-70% פסיכומטרי. בחוגים עם \"ריבוי משוקללים\" נלקח הגבוה מבין שקלול זה לשקלול 50/50.", scalePsy:"סולם פסיכומטרי, 200-800", detTau:"ציון התאמה לפי הנוסחה הרשמית של אוניברסיטת תל אביב. למדעים מדויקים והנדסה תיתכן תוספת בונוס על מתמטיקה ופיזיקה 5 יחידות.", detCombined:"ציון משולב = ממוצע של ציון הפסיכומטרי וממוצע הבגרות כשהוא מומר לסולם פסיכומטרי.", detTelhai:"המוסד מפרסם ציון משוקלל שהוא ממוצע של שני הרכיבים, בלי פירוט אריתמטי מלא - התוצאה הערכה.", scale100:"סולם 0-100", detJct:"ציון התאמה לפי נוסחת המרכז האקדמי לב.", detHaifa:"השקלול הרשמי: 75% פסיכומטרי ו-25% בגרות. המרת הבגרות המדויקת לסולם נעשית במחשבון הרשמי של האוניברסיטה - התוצאה כאן הערכה.", detBgu:"השקלול הרשמי: 50% פסיכומטרי ו-50% בגרות, לפני בונוסים (למשל מתמטיקה 5 יחידות). ההמרה המדויקת נעשית במחשבון הרשמי - התוצאה כאן הערכה.", detSapir:"הנוסחה פורסמה עבור משפטים בלבד. במחלקות אחרות חלים ספי קבלה נפרדים.", detNoFormula:"המוסד אינו מפרסם נוסחת סכם. הקבלה נעשית לפי ספי פסיכומטרי ובגרות נפרדים, כפי שמופיעים ברשימת התארים בעמוד המוסד.", openDet:"האוניברסיטה הפתוחה אינה משתמשת בממוצע בגרות כלל - הקבלה פתוחה לכולם, בלי תנאי סף.", stdLabel:"הערכה לפי השיטה הסטנדרטית (25 נקודות ב-5 יח״ל, 12.5 ב-4 יח״ל)", bagLblTau:"לפי הידיעון הרשמי של אוניברסיטת תל אביב", bagLblTechnion:"לפי ידיעון הטכניון (לא כולל ארכיטקטורה ואדריכלות נוף)", techNote:"יחידות המתמטיקה נספרות במשקל כפול. בונוס קומבו מדעי-טכנולוגי מיוחד אינו מחושב כאן.", bagLblBgu:"לפי ידיעון אוניברסיטת בן-גוריון בנגב", bagLblBiu:"לפי ידיעון אוניברסיטת בר-אילן", bagLblHaifa:"לפי ידיעון אוניברסיטת חיפה", bagLblYvc:"המכללה האקדמית עמק יזרעאל - ממוצע גולמי ללא בונוסים כלל, לפי האתר הרשמי", cmpTitle:"⚖️ השוואת מוסדות לפי תואר", cmpDegreeName:"שם התואר", cmpPh:"למשל: מדעי המחשב", cmpNotFound:"לא נמצא תואר מתאים", cmpInstCount:"{name} - {n} מוסדות", thInst:"מוסד", thPsy:"פסיכומטרי", thBag:"ממוצע בגרות", thSec:"סכם / התאמה", thTuit:"שכר לימוד לשנה", favTitle:"⭐ המועדפים שלי ({n})", favEmpty:"עדיין אין מועדפים. בעמוד של מוסד, לחץ על הכוכב ליד תואר כדי להוסיף אותו לכאן.", quizTitle:"🧭 איזה תואר מתאים לי", quizResults:"🧭 התוצאות שלך", qOf:"שאלה {a} מתוך {b}", qBack:"→ חזרה לשאלה הקודמת", qAgain:"🔄 מילוי השאלון מחדש", qTipMy:"התארים מסומנים לפי הציונים שלך: ✅ מתאים • ❌ לא מתאים • ❓ חסר ציון לבדיקה, והמתאימים מופיעים ראשונים.", qTipNoMy:"טיפ: הזן את הציונים שלך בכפתור \"🎯 הציונים שלי\" בראש העמוד, וחזור לכאן כדי לראות ליד כל תואר אם אתה עומד בסף.", noDegreesArea:"אין תארים בתחום זה", themeTitle:"מעבר בין תצוגת יום לתצוגת לילה", langTitle:"שינוי שפה", secShort:"סכם", subjGradeOnly:"ציון {g} ומעלה", bagShort:"בגרות", tuitionWord:"שכר לימוד"},
+en: {titleTag:"ToarNet | Academic Admission Requirements", tagline:"Up-to-date admission requirements for bachelor's degrees - every university and college in Israel", loading:"Loading data…", searchPh:"Exact search - degree or institution name…", pickPh:"Pick from list - all institutions…", myScores:"🎯 My scores", myScoresOn:"🎯 My scores ✓", featCalc:"🧮 Sehem & Matriculation Calculator", featCmp:"⚖️ Compare Institutions", featFav:"⭐ Favorites", featQuiz:"🧭 Which Degree Suits Me", featHint:"Registered users only • Registration is free", lblPsy:"Psychometric score", lblBag:"Matriculation average", lblMu:"Math units (optional)", lblMg:"Math grade", lblEu:"English units (optional)", lblEg:"English grade", phEx620:"e.g. 620", phEx95:"e.g. 95", save:"Save", clear:"Clear", myNote:"Saved in your browser, and for signed-in users also in the account • Math and English are optional, used to filter degrees blocked for you", authTitle:"Sign in", authMsg:"Advanced features - the sehem and matriculation calculator, institution comparison, favorites, tuition and the degree-match quiz - are available to registered users. Registration is free and takes half a minute.", gLogin:"Sign in with Google", or:"or", emailPh:"Email address", sendLink:"Send me a sign-in link", stepCodeTxt:"📧 We sent a sign-in link to your email. Open the email and click the link - you will return here signed in.", gotIt:"Got it, close", back:"Back", login:"🔐 Sign in", logout:"Sign out", connected:"signed in", footerB:"Please note:", footerTxt:"This site covers bachelor's degrees only. Data was collected from the institutions' official websites and is current for the data year shown next to each institution. Admission cutoffs change from year to year and depend on demand - always verify with the institution itself before applying.", updFmt:"Updated: {d} • {n} institutions", all:"All", unis:"Universities", cols:"Colleges", typeUni:"University", typeCol:"College", degLine:"{n} degrees • {y} data", degShort:"{n} degrees", matchForYou:"🎯 Matching you:", noDataYet:"No data yet", backAll:"← Back to all institutions", rngPsy:"Psychometric range (min-max)", rngBag:"Matriculation average range (min-max)", rngSec:"Sehem / matching score range (min-max)", notPublished:"Not published", degCount:"Number of degrees", dataOf:"Data", source:"Source", officialSite:"Official website", allDegrees:"📋 All degrees and admission thresholds", onlyMineInst:"Show only degrees that match me", noMatchEntered:"No degrees match the data you entered", psy:"Psychometric", bagAvg:"Matriculation average", sechemReq:"Required sehem / matching score", blockedForYou:"🚫 Blocked for you: ", blkMathUnits:"Math {u} units required, you have {m}", blkMathGrade:"Math grade {g} required, you have {m}", blkEngUnits:"English {u} units required, you have {m}", blkEngGrade:"English grade {g} required, you have {m}", subjMath:"Math", subjEng:"English", subjUnits:"units", subjGradeUp:"grade {g} and up", subjPass:"(passing grade)", subjUnknown:"unknown", subjLevel:"level", starTitle:"Add to favorites", badgeOk:"✅ Meets requirements", badgeNo:"❌ Does not meet requirements", badgeUnk:"❓ Unknown", openInstPage:"Open institution page", onlyMineSearch:"Show only what matches my scores", noResults:"No results found", loginUnavailable:"The sign-in service is currently unavailable", invalidEmail:"Enter a valid email address", sendError:"Sending failed. Please try again in a moment.", linkSent:"The link was sent to ", loadError:"Error loading data", tuitionLine:"💰 Tuition: {x} ₪ per year", calculators:"🧮 Calculators", tabSechem:"Sehem / matching score", tabBag:"Weighted matriculation average", lblInst:"Institution", calcBtn:"Calculate", calcNote:"The calculation is based on formulas published by the institutions on their official websites. When marked \"estimate\", the full formula exists only in the institution's official calculator.", bagInstLbl:"Institution (determines the bonus method)", bagIntro:"Enter your matriculation subjects. Mandatory subjects are never dropped in the optimal calculation; elective subjects that lower the average are dropped automatically, as long as at least 20 units remain.", addSubject:"+ Add subject", calcAvg:"Calculate average", bagNote:"Bonus methods follow official publications of the institutions. When marked \"estimate\", the institution does not publish an official method and the standard method is used.", unitsWord:"units", mand:"Mandatory", removeTitle:"Remove subject", gradePh:"Grade", bagMinSubjects:"Enter at least 3 subjects with grades", weightedOf:"{name} - your weighted matriculation average", estimateWord:"estimate", includedLine:"Included {n} subjects, {u} units", droppedLine:"Dropped in the optimal calculation: {list}", useAvg:"Use this average in my scores", savedToScores:"✓ Saved to my scores", yourSehem:"{name} - your sehem", officialFormula:"Per the official formula", errPsy:"A psychometric score is required for the calculation", errBag:"A matriculation average is also required for the calculation", scaleHuji:"Weighted score, scale 10-30 approx.", detHuji:"Per the Hebrew University's official formula: a matriculation standard (average on the 11.52 scale) and a psychometric standard, weighted 30% matriculation and 70% psychometric. In departments with multiple weightings, the higher of this and a 50/50 weighting is taken.", scalePsy:"Psychometric scale, 200-800", detTau:"Matching score per Tel Aviv University's official formula. Exact sciences and engineering may add a bonus for 5-unit math and physics.", detCombined:"Combined score = the average of the psychometric score and the matriculation average converted to the psychometric scale.", detTelhai:"The institution publishes a weighted score that averages the two components, without a full arithmetic breakdown - this result is an estimate.", scale100:"Scale 0-100", detJct:"Matching score per the Jerusalem College of Technology formula.", detHaifa:"The official weighting: 75% psychometric and 25% matriculation. The exact conversion of the matriculation average is done in the university's official calculator - this result is an estimate.", detBgu:"The official weighting: 50% psychometric and 50% matriculation, before bonuses (e.g. 5-unit math). The exact conversion is done in the official calculator - this result is an estimate.", detSapir:"The formula was published for Law only. Other departments use separate admission thresholds.", detNoFormula:"The institution does not publish a sehem formula. Admission is by separate psychometric and matriculation thresholds, as listed on the institution page.", openDet:"The Open University does not use a matriculation average at all - admission is open to everyone, with no thresholds.", stdLabel:"Estimate by the standard method (25 points at 5 units, 12.5 at 4 units)", bagLblTau:"Per Tel Aviv University's official handbook", bagLblTechnion:"Per the Technion handbook (excluding Architecture and Landscape Architecture)", techNote:"Math units are counted at double weight. A special science-technology combo bonus is not calculated here.", bagLblBgu:"Per the Ben-Gurion University handbook", bagLblBiu:"Per the Bar-Ilan University handbook", bagLblHaifa:"Per the University of Haifa handbook", bagLblYvc:"Jezreel Valley Academic College - raw average with no bonuses at all, per the official website", cmpTitle:"⚖️ Compare institutions by degree", cmpDegreeName:"Degree name", cmpPh:"e.g. מדעי המחשב", cmpNotFound:"No matching degree found", cmpInstCount:"{name} - {n} institutions", thInst:"Institution", thPsy:"Psychometric", thBag:"Matriculation average", thSec:"Sehem / matching", thTuit:"Tuition per year", favTitle:"⭐ My favorites ({n})", favEmpty:"No favorites yet. On an institution page, click the star next to a degree to add it here.", quizTitle:"🧭 Which degree suits me", quizResults:"🧭 Your results", qOf:"Question {a} of {b}", qBack:"← Back to previous question", qAgain:"🔄 Retake the quiz", qTipMy:"Degrees are marked by your scores: ✅ match • ❌ no match • ❓ missing score, and matches appear first.", qTipNoMy:"Tip: enter your scores with the \"🎯 My scores\" button at the top of the page, then come back to see next to each degree whether you meet its threshold.", noDegreesArea:"No degrees in this field", themeTitle:"Toggle between day and night display", langTitle:"Change language", secShort:"Sehem", subjGradeOnly:"grade {g} and up", bagShort:"Matriculation", tuitionWord:"Tuition"}
+};
+const t = k => (TR[LANG] && TR[LANG][k]) || TR.he[k] || k;
+const tf = (k, o) => { let s = t(k); Object.keys(o || {}).forEach(a => { s = s.split('{' + a + '}').join(o[a]); }); return s; };
+const LOC = {he:'he-IL', en:'en-US', ru:'ru-RU', fr:'fr-FR', ar:'ar-EG'};
+const locTag = () => LOC[LANG] || 'he-IL';
+const typeLabel = ty => ty === 'אוניברסיטה' ? t('typeUni') : t('typeCol');
+const LANG_NAMES = {he:'עברית', en:'English', ru:'Русский', fr:'Français', ar:'العربية'};
+TR.ru = {titleTag:"ТоарНет | Требования для поступления", tagline:"Актуальные требования для поступления на бакалавриат - все университеты и колледжи Израиля", loading:"Загрузка данных…", searchPh:"Точный поиск - название программы или вуза…", pickPh:"Выбор из списка - все вузы…", myScores:"🎯 Мои оценки", myScoresOn:"🎯 Мои оценки ✓", featCalc:"🧮 Калькулятор сехема и багрута", featCmp:"⚖️ Сравнение вузов", featFav:"⭐ Избранное", featQuiz:"🧭 Какая программа мне подходит", featHint:"Только для зарегистрированных • Регистрация бесплатна", lblPsy:"Балл психометрии", lblBag:"Средний балл багрута", lblMu:"Единицы математики (необязательно)", lblMg:"Оценка по математике", lblEu:"Единицы английского (необязательно)", lblEg:"Оценка по английскому", phEx620:"например 620", phEx95:"например 95", save:"Сохранить", clear:"Сбросить", myNote:"Сохраняется в браузере, а у вошедших пользователей - также в аккаунте • Математика и английский необязательны, используются для фильтрации недоступных вам программ", authTitle:"Вход на сайт", authMsg:"Расширенные функции - калькулятор сехема и багрута, сравнение вузов, избранное, стоимость обучения и тест подбора программы - доступны зарегистрированным пользователям. Регистрация бесплатна и занимает полминуты.", gLogin:"Войти через Google", or:"или", emailPh:"Адрес эл. почты", sendLink:"Прислать ссылку для входа", stepCodeTxt:"📧 Мы отправили ссылку для входа на вашу почту. Откройте письмо и перейдите по ссылке - вы вернётесь на сайт авторизованным.", gotIt:"Понятно, закрыть", back:"Назад", login:"🔐 Войти", logout:"Выйти", connected:"вы вошли", footerB:"Обратите внимание:", footerTxt:"Сайт содержит только программы бакалавриата. Данные собраны с официальных сайтов вузов и актуальны на год данных, указанный рядом с каждым вузом. Проходные баллы меняются из года в год и зависят от спроса - всегда проверяйте в самом вузе перед подачей документов.", updFmt:"Обновлено: {d} • вузов: {n}", all:"Все", unis:"Университеты", cols:"Колледжи", typeUni:"Университет", typeCol:"Колледж", degLine:"Программ: {n} • данные {y}", degShort:"Программ: {n}", matchForYou:"🎯 Подходят вам:", noDataYet:"Данных пока нет", backAll:"← Назад ко всем вузам", rngPsy:"Диапазон психометрии (мин-макс)", rngBag:"Диапазон среднего багрута (мин-макс)", rngSec:"Диапазон сехема / итогового балла (мин-макс)", notPublished:"Не опубликовано", degCount:"Число программ", dataOf:"Данные", source:"Источник", officialSite:"Официальный сайт", allDegrees:"📋 Все программы и требования", onlyMineInst:"Показывать только подходящие мне программы", noMatchEntered:"Нет программ, подходящих под введённые данные", psy:"Психометрия", bagAvg:"Средний багрут", sechemReq:"Требуемый сехем / итоговый балл", blockedForYou:"🚫 Недоступно для вас: ", blkMathUnits:"Нужна математика {u} ед., у вас {m}", blkMathGrade:"Нужна оценка {g} по математике, у вас {m}", blkEngUnits:"Нужен английский {u} ед., у вас {m}", blkEngGrade:"Нужна оценка {g} по английскому, у вас {m}", subjMath:"Математика", subjEng:"Английский", subjUnits:"ед.", subjGradeUp:"оценка {g} и выше", subjPass:"(зачётная оценка)", subjUnknown:"неизвестно", subjLevel:"уровень", starTitle:"Добавить в избранное", badgeOk:"✅ Соответствует требованиям", badgeNo:"❌ Не соответствует требованиям", badgeUnk:"❓ Неизвестно", openInstPage:"Открыть страницу вуза", onlyMineSearch:"Показывать только то, что подходит под мои оценки", noResults:"Ничего не найдено", loginUnavailable:"Служба входа сейчас недоступна", invalidEmail:"Введите корректный адрес почты", sendError:"Ошибка отправки. Попробуйте ещё раз через минуту.", linkSent:"Ссылка отправлена на ", loadError:"Ошибка загрузки данных", tuitionLine:"💰 Стоимость обучения: {x} ₪ в год", calculators:"🧮 Калькуляторы", tabSechem:"Сехем / итоговый балл", tabBag:"Взвешенный средний багрут", lblInst:"Вуз", calcBtn:"Рассчитать", calcNote:"Расчёт основан на формулах, опубликованных вузами на их официальных сайтах. Отметка \"оценка\" означает, что полная формула есть только в официальном калькуляторе вуза.", bagInstLbl:"Вуз (определяет метод бонусов)", bagIntro:"Введите предметы вашего багрута. Обязательные предметы никогда не исключаются при оптимальном расчёте; предметы по выбору, снижающие средний балл, исключаются автоматически, пока остаётся не менее 20 единиц.", addSubject:"+ Добавить предмет", calcAvg:"Рассчитать средний", bagNote:"Методы бонусов - по официальным публикациям вузов. Отметка \"оценка\" означает, что вуз не публикует официальный метод и применяется стандартный.", unitsWord:"ед.", mand:"Обязательный", removeTitle:"Удалить предмет", gradePh:"Оценка", bagMinSubjects:"Введите не менее 3 предметов с оценками", weightedOf:"{name} - ваш взвешенный средний багрут", estimateWord:"оценка", includedLine:"Включено предметов: {n}, единиц: {u}", droppedLine:"Исключены при оптимальном расчёте: {list}", useAvg:"Использовать этот средний балл в моих оценках", savedToScores:"✓ Сохранено в моих оценках", yourSehem:"{name} - ваш сехем", officialFormula:"По официальной формуле", errPsy:"Для расчёта нужен балл психометрии", errBag:"Для расчёта нужен также средний балл багрута", scaleHuji:"Взвешенный балл, шкала примерно 10-30", detHuji:"По официальной формуле Еврейского университета: стандарт багрута (средний по шкале 11.52) и стандарт психометрии, с весами 30% багрут и 70% психометрия. На факультетах с несколькими вариантами взвешивания берётся больший из этого и варианта 50/50.", scalePsy:"Шкала психометрии, 200-800", detTau:"Итоговый балл по официальной формуле Тель-Авивского университета. Для точных наук и инженерии возможен бонус за математику и физику на 5 единиц.", detCombined:"Совокупный балл = среднее балла психометрии и среднего багрута, переведённого в шкалу психометрии.", detTelhai:"Вуз публикует взвешенный балл как среднее двух компонентов, без полной арифметической детализации - результат является оценкой.", scale100:"Шкала 0-100", detJct:"Итоговый балл по формуле Иерусалимского технологического колледжа.", detHaifa:"Официальные веса: 75% психометрия и 25% багрут. Точный перевод среднего багрута выполняется в официальном калькуляторе университета - результат здесь является оценкой.", detBgu:"Официальные веса: 50% психометрия и 50% багрут, до бонусов (например, математика на 5 единиц). Точный перевод выполняется в официальном калькуляторе - результат здесь является оценкой.", detSapir:"Формула опубликована только для юриспруденции. На других факультетах действуют отдельные пороги поступления.", detNoFormula:"Вуз не публикует формулу сехема. Поступление - по отдельным порогам психометрии и багрута, указанным в списке программ на странице вуза.", openDet:"Открытый университет вообще не использует средний багрут - поступление открыто для всех, без порогов.", stdLabel:"Оценка по стандартному методу (25 баллов за 5 единиц, 12.5 за 4 единицы)", bagLblTau:"По официальному справочнику Тель-Авивского университета", bagLblTechnion:"По справочнику Техниона (кроме архитектуры и ландшафтной архитектуры)", techNote:"Единицы математики считаются с двойным весом. Специальный научно-технический комбо-бонус здесь не рассчитывается.", bagLblBgu:"По справочнику Университета Бен-Гуриона", bagLblBiu:"По справочнику Университета Бар-Илан", bagLblHaifa:"По справочнику Хайфского университета", bagLblYvc:"Академический колледж Изреельской долины - чистый средний балл без бонусов, по официальному сайту", cmpTitle:"⚖️ Сравнение вузов по программе", cmpDegreeName:"Название программы", cmpPh:"например: מדעי המחשב", cmpNotFound:"Подходящая программа не найдена", cmpInstCount:"{name} - вузов: {n}", thInst:"Вуз", thPsy:"Психометрия", thBag:"Средний багрут", thSec:"Сехем / итоговый", thTuit:"Обучение в год", favTitle:"⭐ Моё избранное ({n})", favEmpty:"Избранного пока нет. На странице вуза нажмите звезду рядом с программой, чтобы добавить её сюда.", quizTitle:"🧭 Какая программа мне подходит", quizResults:"🧭 Ваши результаты", qOf:"Вопрос {a} из {b}", qBack:"← Назад к предыдущему вопросу", qAgain:"🔄 Пройти тест заново", qTipMy:"Программы отмечены по вашим оценкам: ✅ подходит • ❌ не подходит • ❓ не хватает оценки, подходящие идут первыми.", qTipNoMy:"Совет: введите свои оценки кнопкой \"🎯 Мои оценки\" вверху страницы и вернитесь сюда, чтобы видеть рядом с каждой программой, проходите ли вы порог.", noDegreesArea:"В этой области программ нет", themeTitle:"Переключение между дневной и ночной темой", langTitle:"Сменить язык", secShort:"Сехем", subjGradeOnly:"оценка {g} и выше", bagShort:"Багрут", tuitionWord:"Стоимость обучения"};
+TR.fr = {titleTag:"ToarNet | Conditions d'admission académique", tagline:"Conditions d'admission à jour pour les licences - toutes les universités et écoles d'Israël", loading:"Chargement des données…", searchPh:"Recherche exacte - nom de diplôme ou d'établissement…", pickPh:"Choisir dans la liste - tous les établissements…", myScores:"🎯 Mes notes", myScoresOn:"🎯 Mes notes ✓", featCalc:"🧮 Calculateur Sehem et Bac", featCmp:"⚖️ Comparer les établissements", featFav:"⭐ Favoris", featQuiz:"🧭 Quel diplôme me convient", featHint:"Utilisateurs inscrits uniquement • Inscription gratuite", lblPsy:"Score psychométrique", lblBag:"Moyenne du bac", lblMu:"Unités de maths (optionnel)", lblMg:"Note de maths", lblEu:"Unités d'anglais (optionnel)", lblEg:"Note d'anglais", phEx620:"ex. 620", phEx95:"ex. 95", save:"Enregistrer", clear:"Effacer", myNote:"Enregistré dans votre navigateur, et pour les utilisateurs connectés aussi dans le compte • Les maths et l'anglais sont optionnels, utilisés pour filtrer les diplômes bloqués pour vous", authTitle:"Connexion", authMsg:"Les fonctions avancées - calculateur de sehem et de bac, comparaison d'établissements, favoris, frais de scolarité et questionnaire d'orientation - sont réservées aux utilisateurs inscrits. L'inscription est gratuite et prend une demi-minute.", gLogin:"Se connecter avec Google", or:"ou", emailPh:"Adresse e-mail", sendLink:"M'envoyer un lien de connexion", stepCodeTxt:"📧 Nous avons envoyé un lien de connexion à votre e-mail. Ouvrez l'e-mail et cliquez sur le lien - vous reviendrez ici connecté.", gotIt:"Compris, fermer", back:"Retour", login:"🔐 Connexion", logout:"Déconnexion", connected:"connecté", footerB:"Attention :", footerTxt:"Ce site ne couvre que les diplômes de licence. Les données ont été collectées sur les sites officiels des établissements et sont à jour pour l'année indiquée près de chaque établissement. Les seuils d'admission changent chaque année et dépendent de la demande - vérifiez toujours auprès de l'établissement avant de postuler.", updFmt:"Mis à jour : {d} • {n} établissements", all:"Tout", unis:"Universités", cols:"Écoles supérieures", typeUni:"Université", typeCol:"École supérieure", degLine:"{n} diplômes • données {y}", degShort:"{n} diplômes", matchForYou:"🎯 Compatibles avec vous :", noDataYet:"Pas encore de données", backAll:"← Retour à tous les établissements", rngPsy:"Fourchette psychométrique (min-max)", rngBag:"Fourchette de moyenne du bac (min-max)", rngSec:"Fourchette sehem / score d'adéquation (min-max)", notPublished:"Non publié", degCount:"Nombre de diplômes", dataOf:"Données", source:"Source", officialSite:"Site officiel", allDegrees:"📋 Tous les diplômes et seuils d'admission", onlyMineInst:"Afficher uniquement les diplômes qui me correspondent", noMatchEntered:"Aucun diplôme ne correspond aux données saisies", psy:"Psychométrique", bagAvg:"Moyenne du bac", sechemReq:"Sehem / score requis", blockedForYou:"🚫 Bloqué pour vous : ", blkMathUnits:"Maths {u} unités requises, vous avez {m}", blkMathGrade:"Note de maths {g} requise, vous avez {m}", blkEngUnits:"Anglais {u} unités requis, vous avez {m}", blkEngGrade:"Note d'anglais {g} requise, vous avez {m}", subjMath:"Maths", subjEng:"Anglais", subjUnits:"unités", subjGradeUp:"note {g} et plus", subjPass:"(note de passage)", subjUnknown:"inconnu", subjLevel:"niveau", starTitle:"Ajouter aux favoris", badgeOk:"✅ Conditions remplies", badgeNo:"❌ Conditions non remplies", badgeUnk:"❓ Inconnu", openInstPage:"Ouvrir la page de l'établissement", onlyMineSearch:"Afficher uniquement ce qui correspond à mes notes", noResults:"Aucun résultat", loginUnavailable:"Le service de connexion est actuellement indisponible", invalidEmail:"Saisissez une adresse e-mail valide", sendError:"Échec de l'envoi. Réessayez dans un instant.", linkSent:"Le lien a été envoyé à ", loadError:"Erreur de chargement des données", tuitionLine:"💰 Frais de scolarité : {x} ₪ par an", calculators:"🧮 Calculateurs", tabSechem:"Sehem / score d'adéquation", tabBag:"Moyenne du bac pondérée", lblInst:"Établissement", calcBtn:"Calculer", calcNote:"Le calcul repose sur les formules publiées par les établissements sur leurs sites officiels. Quand \"estimation\" est indiqué, la formule complète n'existe que dans le calculateur officiel de l'établissement.", bagInstLbl:"Établissement (détermine la méthode de bonus)", bagIntro:"Saisissez vos matières du bac. Les matières obligatoires ne sont jamais retirées dans le calcul optimal ; les matières optionnelles qui baissent la moyenne sont retirées automatiquement, tant qu'il reste au moins 20 unités.", addSubject:"+ Ajouter une matière", calcAvg:"Calculer la moyenne", bagNote:"Les méthodes de bonus suivent les publications officielles des établissements. Quand \"estimation\" est indiqué, l'établissement ne publie pas de méthode officielle et la méthode standard est utilisée.", unitsWord:"unités", mand:"Obligatoire", removeTitle:"Retirer la matière", gradePh:"Note", bagMinSubjects:"Saisissez au moins 3 matières avec des notes", weightedOf:"{name} - votre moyenne du bac pondérée", estimateWord:"estimation", includedLine:"{n} matières incluses, {u} unités", droppedLine:"Retirées dans le calcul optimal : {list}", useAvg:"Utiliser cette moyenne dans mes notes", savedToScores:"✓ Enregistré dans mes notes", yourSehem:"{name} - votre sehem", officialFormula:"Selon la formule officielle", errPsy:"Un score psychométrique est requis pour le calcul", errBag:"Une moyenne du bac est également requise pour le calcul", scaleHuji:"Score pondéré, échelle 10-30 environ", detHuji:"Selon la formule officielle de l'Université hébraïque : un standard de bac (moyenne sur l'échelle 11.52) et un standard psychométrique, pondérés 30% bac et 70% psychométrique. Dans les départements à pondérations multiples, le plus élevé entre ce calcul et un 50/50 est retenu.", scalePsy:"Échelle psychométrique, 200-800", detTau:"Score d'adéquation selon la formule officielle de l'Université de Tel Aviv. Les sciences exactes et l'ingénierie peuvent ajouter un bonus pour les maths et la physique à 5 unités.", detCombined:"Score combiné = moyenne du score psychométrique et de la moyenne du bac convertie à l'échelle psychométrique.", detTelhai:"L'établissement publie un score pondéré qui fait la moyenne des deux composantes, sans détail arithmétique complet - ce résultat est une estimation.", scale100:"Échelle 0-100", detJct:"Score d'adéquation selon la formule du Jerusalem College of Technology.", detHaifa:"La pondération officielle : 75% psychométrique et 25% bac. La conversion exacte de la moyenne du bac se fait dans le calculateur officiel de l'université - ce résultat est une estimation.", detBgu:"La pondération officielle : 50% psychométrique et 50% bac, avant bonus (par ex. maths à 5 unités). La conversion exacte se fait dans le calculateur officiel - ce résultat est une estimation.", detSapir:"La formule a été publiée pour le droit uniquement. Les autres départements appliquent des seuils d'admission distincts.", detNoFormula:"L'établissement ne publie pas de formule de sehem. L'admission se fait selon des seuils psychométriques et de bac distincts, comme indiqué sur la page de l'établissement.", openDet:"L'Université ouverte n'utilise pas du tout la moyenne du bac - l'admission est ouverte à tous, sans seuils.", stdLabel:"Estimation selon la méthode standard (25 points à 5 unités, 12.5 à 4 unités)", bagLblTau:"Selon le livret officiel de l'Université de Tel Aviv", bagLblTechnion:"Selon le livret du Technion (hors architecture et architecture du paysage)", techNote:"Les unités de maths comptent double. Un bonus combo spécial sciences-technologie n'est pas calculé ici.", bagLblBgu:"Selon le livret de l'Université Ben-Gourion", bagLblBiu:"Selon le livret de l'Université Bar-Ilan", bagLblHaifa:"Selon le livret de l'Université de Haïfa", bagLblYvc:"Jezreel Valley Academic College - moyenne brute sans aucun bonus, selon le site officiel", cmpTitle:"⚖️ Comparer les établissements par diplôme", cmpDegreeName:"Nom du diplôme", cmpPh:"ex. מדעי המחשב", cmpNotFound:"Aucun diplôme correspondant", cmpInstCount:"{name} - {n} établissements", thInst:"Établissement", thPsy:"Psychométrique", thBag:"Moyenne du bac", thSec:"Sehem / adéquation", thTuit:"Frais par an", favTitle:"⭐ Mes favoris ({n})", favEmpty:"Pas encore de favoris. Sur la page d'un établissement, cliquez sur l'étoile près d'un diplôme pour l'ajouter ici.", quizTitle:"🧭 Quel diplôme me convient", quizResults:"🧭 Vos résultats", qOf:"Question {a} sur {b}", qBack:"← Retour à la question précédente", qAgain:"🔄 Refaire le questionnaire", qTipMy:"Les diplômes sont marqués selon vos notes : ✅ compatible • ❌ non compatible • ❓ note manquante, et les compatibles apparaissent en premier.", qTipNoMy:"Astuce : saisissez vos notes avec le bouton \"🎯 Mes notes\" en haut de la page, puis revenez ici pour voir près de chaque diplôme si vous atteignez son seuil.", noDegreesArea:"Aucun diplôme dans ce domaine", themeTitle:"Basculer entre affichage jour et nuit", langTitle:"Changer de langue", secShort:"Sehem", subjGradeOnly:"note {g} et plus", bagShort:"Bac", tuitionWord:"Frais de scolarité"};
+TR.ar = {titleTag:"توار نت | متطلبات القبول الأكاديمي", tagline:"متطلبات قبول محدثة لدرجة البكالوريوس - في كل جامعة وكلية في إسرائيل", loading:"جار تحميل البيانات…", searchPh:"بحث دقيق - اسم الدرجة أو المؤسسة…", pickPh:"اختيار من القائمة - كل المؤسسات…", myScores:"🎯 درجاتي", myScoresOn:"🎯 درجاتي ✓", featCalc:"🧮 حاسبة السخم والبجروت", featCmp:"⚖️ مقارنة المؤسسات", featFav:"⭐ المفضلة", featQuiz:"🧭 ما الدرجة المناسبة لي", featHint:"للمستخدمين المسجلين فقط • التسجيل مجاني", lblPsy:"علامة البسيخومتري", lblBag:"معدل البجروت", lblMu:"وحدات الرياضيات (اختياري)", lblMg:"علامة الرياضيات", lblEu:"وحدات الإنجليزية (اختياري)", lblEg:"علامة الإنجليزية", phEx620:"مثال 620", phEx95:"مثال 95", save:"حفظ", clear:"مسح", myNote:"يُحفظ في المتصفح، وللمستخدمين المسجلين أيضا في الحساب • الرياضيات والإنجليزية اختياريان، ويستخدمان لتصفية الدرجات المحظورة عنك", authTitle:"تسجيل الدخول", authMsg:"الميزات المتقدمة - حاسبة السخم والبجروت ومقارنة المؤسسات والمفضلة والرسوم الدراسية واستبيان اختيار الدرجة - متاحة للمستخدمين المسجلين. التسجيل مجاني ويستغرق نصف دقيقة.", gLogin:"الدخول عبر Google", or:"أو", emailPh:"عنوان البريد الإلكتروني", sendLink:"أرسلوا لي رابط دخول", stepCodeTxt:"📧 أرسلنا رابط دخول إلى بريدك الإلكتروني. افتح الرسالة واضغط على الرابط - ستعود إلى هنا مسجلا.", gotIt:"فهمت، إغلاق", back:"رجوع", login:"🔐 دخول", logout:"خروج", connected:"مسجل", footerB:"انتبهوا:", footerTxt:"يعرض الموقع درجات البكالوريوس فقط. جُمعت البيانات من المواقع الرسمية للمؤسسات وهي محدثة لسنة البيانات المذكورة بجانب كل مؤسسة. تتغير حدود القبول من سنة إلى أخرى وتتأثر بالطلب - يجب التأكد دائما من المؤسسة نفسها قبل تقديم الطلب.", updFmt:"حُدث: {d} • {n} مؤسسة", all:"الكل", unis:"الجامعات", cols:"الكليات", typeUni:"جامعة", typeCol:"كلية", degLine:"{n} درجة • بيانات {y}", degShort:"{n} درجة", matchForYou:"🎯 المناسبة لك:", noDataYet:"لا توجد بيانات بعد", backAll:"→ رجوع إلى كل المؤسسات", rngPsy:"نطاق البسيخومتري (الأدنى-الأعلى)", rngBag:"نطاق معدل البجروت (الأدنى-الأعلى)", rngSec:"نطاق السخم / الملاءمة (الأدنى-الأعلى)", notPublished:"غير منشور", degCount:"عدد الدرجات", dataOf:"بيانات", source:"المصدر", officialSite:"الموقع الرسمي", allDegrees:"📋 كل الدرجات ومتطلبات القبول", onlyMineInst:"اعرض فقط الدرجات المناسبة لي", noMatchEntered:"لا توجد درجات مناسبة للبيانات التي أدخلتها", psy:"بسيخومتري", bagAvg:"معدل البجروت", sechemReq:"السخم / الملاءمة المطلوب", blockedForYou:"🚫 محظور عنك: ", blkMathUnits:"مطلوبة رياضيات {u} وحدات، لديك {m}", blkMathGrade:"مطلوبة علامة {g} في الرياضيات، لديك {m}", blkEngUnits:"مطلوبة إنجليزية {u} وحدات، لديك {m}", blkEngGrade:"مطلوبة علامة {g} في الإنجليزية، لديك {m}", subjMath:"الرياضيات", subjEng:"الإنجليزية", subjUnits:"وحدات", subjGradeUp:"بعلامة {g} فما فوق", subjPass:"(علامة نجاح)", subjUnknown:"غير معروف", subjLevel:"مستوى", starTitle:"إضافة إلى المفضلة", badgeOk:"✅ يستوفي المتطلبات", badgeNo:"❌ لا يستوفي المتطلبات", badgeUnk:"❓ غير معروف", openInstPage:"فتح صفحة المؤسسة", onlyMineSearch:"اعرض فقط ما يناسب درجاتي", noResults:"لا توجد نتائج", loginUnavailable:"خدمة الدخول غير متاحة حاليا", invalidEmail:"أدخل عنوان بريد إلكتروني صحيحا", sendError:"حدث خطأ في الإرسال. حاول مرة أخرى بعد قليل.", linkSent:"أُرسل الرابط إلى ", loadError:"خطأ في تحميل البيانات", tuitionLine:"💰 الرسوم الدراسية: {x} ₪ سنويا", calculators:"🧮 الحاسبات", tabSechem:"السخم / علامة الملاءمة", tabBag:"معدل البجروت المرجح", lblInst:"المؤسسة", calcBtn:"احسب", calcNote:"يستند الحساب إلى صيغ نشرتها المؤسسات على مواقعها الرسمية. عند كتابة \"تقدير\" فإن الصيغة الكاملة موجودة فقط في حاسبة المؤسسة الرسمية.", bagInstLbl:"المؤسسة (تحدد طريقة المكافآت)", bagIntro:"أدخل مواضيع البجروت الخاصة بك. المواضيع الإلزامية لا تُحذف أبدا في الحساب الأمثل؛ والمواضيع الاختيارية التي تخفض المعدل تُحذف تلقائيا، ما دام يتبقى 20 وحدة على الأقل.", addSubject:"+ أضف موضوعا", calcAvg:"احسب المعدل", bagNote:"طرق المكافآت وفق منشورات المؤسسات الرسمية. عند كتابة \"تقدير\" فإن المؤسسة لا تنشر طريقة رسمية ويُستخدم الطريقة القياسية.", unitsWord:"وحدات", mand:"إلزامي", removeTitle:"إزالة الموضوع", gradePh:"علامة", bagMinSubjects:"أدخل 3 مواضيع على الأقل مع العلامات", weightedOf:"{name} - معدل البجروت المرجح الخاص بك", estimateWord:"تقدير", includedLine:"شُملت {n} مواضيع، {u} وحدة", droppedLine:"حُذفت في الحساب الأمثل: {list}", useAvg:"استخدم هذا المعدل في درجاتي", savedToScores:"✓ حُفظ في درجاتي", yourSehem:"{name} - السخم الخاص بك", officialFormula:"وفق الصيغة الرسمية", errPsy:"يلزم إدخال علامة البسيخومتري للحساب", errBag:"يلزم أيضا معدل البجروت للحساب", scaleHuji:"علامة مرجحة، مقياس 10-30 تقريبا", detHuji:"وفق الصيغة الرسمية للجامعة العبرية: معيار بجروت (المعدل على مقياس 11.52) ومعيار بسيخومتري، بترجيح 30% بجروت و70% بسيخومتري. في الأقسام ذات الترجيحات المتعددة يُؤخذ الأعلى بين هذا الترجيح وترجيح 50/50.", scalePsy:"مقياس البسيخومتري، 200-800", detTau:"علامة ملاءمة وفق الصيغة الرسمية لجامعة تل أبيب. قد تضيف العلوم الدقيقة والهندسة مكافأة على الرياضيات والفيزياء 5 وحدات.", detCombined:"العلامة المدمجة = متوسط علامة البسيخومتري ومعدل البجروت المحول إلى مقياس البسيخومتري.", detTelhai:"تنشر المؤسسة علامة مرجحة هي متوسط المكونين، دون تفصيل حسابي كامل - هذه النتيجة تقديرية.", scale100:"مقياس 0-100", detJct:"علامة ملاءمة وفق صيغة الكلية الأكاديمية للتكنولوجيا في القدس.", detHaifa:"الترجيح الرسمي: 75% بسيخومتري و25% بجروت. التحويل الدقيق لمعدل البجروت يتم في حاسبة الجامعة الرسمية - هذه النتيجة تقديرية.", detBgu:"الترجيح الرسمي: 50% بسيخومتري و50% بجروت، قبل المكافآت (مثال: رياضيات 5 وحدات). التحويل الدقيق يتم في الحاسبة الرسمية - هذه النتيجة تقديرية.", detSapir:"نُشرت الصيغة للقانون فقط. تطبق الأقسام الأخرى حدود قبول منفصلة.", detNoFormula:"لا تنشر المؤسسة صيغة سخم. يتم القبول وفق حدود منفصلة للبسيخومتري والبجروت، كما تظهر في قائمة الدرجات في صفحة المؤسسة.", openDet:"لا تستخدم الجامعة المفتوحة معدل البجروت إطلاقا - القبول مفتوح للجميع، دون حدود.", stdLabel:"تقدير وفق الطريقة القياسية (25 نقطة عند 5 وحدات، 12.5 عند 4 وحدات)", bagLblTau:"وفق الدليل الرسمي لجامعة تل أبيب", bagLblTechnion:"وفق دليل التخنيون (باستثناء العمارة وعمارة المناظر الطبيعية)", techNote:"تُحسب وحدات الرياضيات بوزن مضاعف. مكافأة الدمج الخاصة بالعلوم والتكنولوجيا غير محسوبة هنا.", bagLblBgu:"وفق دليل جامعة بن غوريون", bagLblBiu:"وفق دليل جامعة بار إيلان", bagLblHaifa:"وفق دليل جامعة حيفا", bagLblYvc:"كلية وادي يزرعيل الأكاديمية - معدل خام دون أي مكافآت، وفق الموقع الرسمي", cmpTitle:"⚖️ مقارنة المؤسسات حسب الدرجة", cmpDegreeName:"اسم الدرجة", cmpPh:"مثال: מדעי המחשב", cmpNotFound:"لم يتم العثور على درجة مناسبة", cmpInstCount:"{name} - {n} مؤسسة", thInst:"المؤسسة", thPsy:"بسيخومتري", thBag:"معدل البجروت", thSec:"السخم / الملاءمة", thTuit:"الرسوم سنويا", favTitle:"⭐ المفضلة لدي ({n})", favEmpty:"لا توجد مفضلة بعد. في صفحة المؤسسة، اضغط على النجمة بجانب الدرجة لإضافتها هنا.", quizTitle:"🧭 ما الدرجة المناسبة لي", quizResults:"🧭 نتائجك", qOf:"السؤال {a} من {b}", qBack:"→ رجوع إلى السؤال السابق", qAgain:"🔄 إعادة ملء الاستبيان", qTipMy:"الدرجات موسومة وفق درجاتك: ✅ مناسبة • ❌ غير مناسبة • ❓ علامة مفقودة، والمناسبة تظهر أولا.", qTipNoMy:"نصيحة: أدخل درجاتك عبر زر \"🎯 درجاتي\" أعلى الصفحة، ثم عد إلى هنا لترى بجانب كل درجة ما إذا كنت تستوفي حدها.", noDegreesArea:"لا توجد درجات في هذا المجال", themeTitle:"التبديل بين العرض النهاري والليلي", langTitle:"تغيير اللغة", secShort:"السخم", subjGradeOnly:"علامة {g} فما فوق", bagShort:"البجروت", tuitionWord:"الرسوم الدراسية"};
 
 
 let MY = null, onlyMine = false;
@@ -296,12 +327,12 @@ function subjBlock(d){
   if(!MY || !d.subj) return [];
   const s = d.subj, out = [];
   if(s.math_units != null && MY.mu != null){
-    if(MY.mu < s.math_units) out.push('נדרשת מתמטיקה ' + s.math_units + ' יח״ל, לך יש ' + MY.mu);
-    else if(MY.mu === s.math_units && s.math_grade != null && MY.mg != null && MY.mg < s.math_grade) out.push('נדרש ציון ' + s.math_grade + ' במתמטיקה, לך יש ' + MY.mg);
+    if(MY.mu < s.math_units) out.push(tf('blkMathUnits', {u: s.math_units, m: MY.mu}));
+    else if(MY.mu === s.math_units && s.math_grade != null && MY.mg != null && MY.mg < s.math_grade) out.push(tf('blkMathGrade', {g: s.math_grade, m: MY.mg}));
   }
   if(s.eng_units != null && MY.eu != null){
-    if(MY.eu < s.eng_units) out.push('נדרשת אנגלית ' + s.eng_units + ' יח״ל, לך יש ' + MY.eu);
-    else if(MY.eu === s.eng_units && s.eng_grade != null && MY.eg != null && MY.eg < s.eng_grade) out.push('נדרש ציון ' + s.eng_grade + ' באנגלית, לך יש ' + MY.eg);
+    if(MY.eu < s.eng_units) out.push(tf('blkEngUnits', {u: s.eng_units, m: MY.eu}));
+    else if(MY.eu === s.eng_units && s.eng_grade != null && MY.eg != null && MY.eg < s.eng_grade) out.push(tf('blkEngGrade', {g: s.eng_grade, m: MY.eg}));
   }
   return out;
 }
@@ -320,22 +351,24 @@ function matchOf(d, instId){
   if(b != null){ if(MY.bag == null) unknown = true; else if(MY.bag < b) return 'no'; }
   return unknown ? 'unk' : 'ok';
 }
-const MBADGE = {ok:'<span class="mbadge m-ok">✅ עומד בדרישות</span>',
-  no:'<span class="mbadge m-no">❌ לא עומד בדרישות</span>',
-  unk:'<span class="mbadge m-unk">❓ לא ידוע</span>'};
+function badgeHtml(m){
+  if(m === 'ok') return '<span class="mbadge m-ok">' + t('badgeOk') + '</span>';
+  if(m === 'no') return '<span class="mbadge m-no">' + t('badgeNo') + '</span>';
+  return '<span class="mbadge m-unk">' + t('badgeUnk') + '</span>';
+}
 let SB = null, USER = null, FAVS = new Set(), curFeat = null;
 let WAS_AUTH = false;
 try{ SB = window.supabase.createClient('https://jmkfqwctuxbdqkhzmwpt.supabase.co', 'sb_publishable_uEle4D1AOWfEwR3bsgoEHA_BgR0-d_y'); }catch(e){ SB = null; }
 const escA = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 function favKey(instId, dname){ return instId + '::' + dname; }
 function tuitText(i){
-  if(i.tuition_yearly != null) return i.tuition_yearly.toLocaleString('he-IL') + ' ₪';
-  return 'לא פורסם';
+  if(i.tuition_yearly != null) return i.tuition_yearly.toLocaleString(locTag()) + ' ₪';
+  return t('notPublished');
 }
 function tuitHtml(i){
   if(!USER) return '';
-  if(i.tuition_yearly != null) return `<div class="tuit">💰 שכר לימוד: ${i.tuition_yearly.toLocaleString('he-IL')} ₪ לשנה</div>`;
-  if(i.tuition_note) return `<div class="tuit">💰 שכר לימוד: ${i.tuition_note}</div>`;
+  if(i.tuition_yearly != null) return `<div class="tuit">${tf('tuitionLine', {x: i.tuition_yearly.toLocaleString(locTag())})}</div>`;
+  if(i.tuition_note) return `<div class="tuit">💰 ${t('tuitionWord')}: ${i.tuition_note}</div>`;
   return '';
 }
 function matchCount(i){ const c = {ok: 0, no: 0, unk: 0}; (i.degrees||[]).forEach(d=>{ const m = matchOf(d, i.id); if(m) c[m]++; }); return c; }
@@ -344,11 +377,8 @@ async function init(){
   try{
     const r = await fetch('data.json',{cache:'no-store'});
     DATA = await r.json();
-  }catch(e){ $('browse').innerHTML = '<div class="empty">שגיאה בטעינת הנתונים</div>'; return; }
-  const up = (DATA.updated||'').split('-');
-  const upF = up.length===3 ? up[2]+'/'+up[1]+'/'+up[0] : (DATA.updated||'');
-  $('upd').textContent = 'עודכן: ' + upF + ' • ' + DATA.institutions.length + ' מוסדות';
-  buildSelect(); renderBrowse();
+  }catch(e){ $('browse').innerHTML = '<div class="empty">' + t('loadError') + '</div>'; return; }
+  buildSelect(); applyLang();
   $('q').addEventListener('input', onSearch);
   $('q').addEventListener('input', buildSugg);
   $('q').addEventListener('keydown', e=>{
@@ -358,10 +388,12 @@ async function init(){
     else if(e.key==='Escape'){ hideSugg(); }
   });
   document.addEventListener('click', e=>{ if(!e.target.closest('.search')) hideSugg(); });
+  $('langBtn').addEventListener('click', e=>{ e.stopPropagation(); const m = $('langMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; });
+  document.addEventListener('click', e=>{ if(!e.target.closest('.langwrap')) $('langMenu').style.display = 'none'; });
   $('instSel').addEventListener('change', e=>{ if(e.target.value) showInst(e.target.value); });
   
   const panel = $('myPanel'), btn = $('myBtn');
-  const syncBtn = ()=>{ btn.classList.toggle('on', !!MY); btn.textContent = MY ? '🎯 הציונים שלי ✓' : '🎯 הציונים שלי'; };
+  const syncBtn = ()=>{ btn.classList.toggle('on', !!MY); btn.textContent = MY ? t('myScoresOn') : t('myScores'); };
   syncBtn();
   if(MY){ $('inPsy').value = MY.psy??''; $('inBag').value = MY.bag??''; $('inMu').value = MY.mu??''; $('inMg').value = MY.mg??''; $('inEu').value = MY.eu??''; $('inEg').value = MY.eg??''; }
   btn.addEventListener('click', ()=>panel.classList.toggle('open'));
@@ -388,7 +420,10 @@ function refreshView(){
 }
 function buildSelect(){
   const s = $('instSel');
-  const groups = {'אוניברסיטה':'אוניברסיטאות','מכללה':'מכללות'};
+  const keep = s.value;
+  s.innerHTML = '';
+  const ph = document.createElement('option'); ph.value = ''; ph.textContent = t('pickPh'); s.appendChild(ph);
+  const groups = {'אוניברסיטה': t('unis'), 'מכללה': t('cols')};
   for(const [type,label] of Object.entries(groups)){
     const og = document.createElement('optgroup'); og.label = label;
     DATA.institutions.filter(i=>i.type===type).forEach(i=>{
@@ -396,21 +431,22 @@ function buildSelect(){
     });
     if(og.children.length) s.appendChild(og);
   }
+  if(keep) s.value = keep;
 }
 function renderBrowse(){
   const unis = DATA.institutions.filter(i=>i.type==='אוניברסיטה');
   const cols = DATA.institutions.filter(i=>i.type==='מכללה');
   const total = DATA.institutions.length;
   let h = `<div class="pills">
-    <button class="pill ${typeFilter==='all'?'active':''}" data-f="all">הכל (${total})</button>
-    <button class="pill ${typeFilter==='uni'?'active':''}" data-f="uni">🎓 אוניברסיטאות (${unis.length})</button>
-    <button class="pill ${typeFilter==='col'?'active':''}" data-f="col">🏫 מכללות (${cols.length})</button>
+    <button class="pill ${typeFilter==='all'?'active':''}" data-f="all">${t('all')} (${total})</button>
+    <button class="pill ${typeFilter==='uni'?'active':''}" data-f="uni">🎓 ${t('unis')} (${unis.length})</button>
+    <button class="pill ${typeFilter==='col'?'active':''}" data-f="col">🏫 ${t('cols')} (${cols.length})</button>
   </div>`;
   if((typeFilter==='all' || typeFilter==='uni') && unis.length)
-    h += '<div class="sec-t">🎓 אוניברסיטאות</div><div class="inst-grid">' + unis.map(card).join('') + '</div>';
+    h += '<div class="sec-t">🎓 ' + t('unis') + '</div><div class="inst-grid">' + unis.map(card).join('') + '</div>';
   if((typeFilter==='all' || typeFilter==='col') && cols.length)
-    h += '<div class="sec-t">🏫 מכללות</div><div class="inst-grid">' + cols.map(card).join('') + '</div>';
-  $('browse').innerHTML = h || '<div class="empty">אין נתונים עדיין</div>';
+    h += '<div class="sec-t">🏫 ' + t('cols') + '</div><div class="inst-grid">' + cols.map(card).join('') + '</div>';
+  $('browse').innerHTML = h || '<div class="empty">' + t('noDataYet') + '</div>';
   document.querySelectorAll('.inst-card').forEach(c=>c.addEventListener('click',()=>showInst(c.dataset.id)));
   document.querySelectorAll('.pill').forEach(p=>p.addEventListener('click',()=>{ typeFilter = p.dataset.f; renderBrowse(); }));
 }
@@ -423,11 +459,11 @@ function odaysSmall(i){
 }
 function card(i){
   const c = MY ? matchCount(i) : null;
-  const mc = c ? `<div class="match-n">🎯 מתאימים לך: ${c.ok} ✅ • ${c.no} ❌ • ${c.unk} ❓</div>` : '';
+  const mc = c ? `<div class="match-n">${t('matchForYou')} ${c.ok} ✅ • ${c.no} ❌ • ${c.unk} ❓</div>` : '';
   return `<div class="inst-card" data-id="${i.id}">
     <h3>${i.name}</h3>
-    <div class="meta"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${i.type}</span><span class="city">${i.city||''}</span></div>
-    <div class="deg-n">${(i.degrees||[]).length} תארים • נתוני ${i.data_year||''}</div>
+    <div class="meta"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${typeLabel(i.type)}</span><span class="city">${i.city||''}</span></div>
+    <div class="deg-n">${tf('degLine', {n: (i.degrees||[]).length, y: i.data_year||''})}</div>
     ${i.nodata?`<div class="nodata">ℹ️ ${i.nodata}</div>`:''}
     ${mc}
     ${odaysSmall(i)}
@@ -445,25 +481,25 @@ function showInst(id){
   const sec = degs.map(d=>d.sechem_min).filter(n=>n!=null);
   const rng = (a,lbl,unit) => a.length ?
     `<div class="rbox"><div class="l">${lbl}</div><div class="v">${Math.min(...a)}–${Math.max(...a)} <small>${unit}</small></div></div>` :
-    `<div class="rbox"><div class="l">${lbl}</div><div class="v" style="font-size:14px;color:var(--dim)">לא פורסם</div></div>`;
+    `<div class="rbox"><div class="l">${lbl}</div><div class="v" style="font-size:14px;color:var(--dim)">${t('notPublished')}</div></div>`;
   const mc = MY ? matchCount(i) : null;
   v.innerHTML = `
-    <button class="back" onclick="goHome()">→ חזרה לכל המוסדות</button>
+    <button class="back" onclick="goHome()">${t('backAll')}</button>
     <div class="sum">
       <h2>${i.name}</h2>
-      <div class="row"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${i.type}</span><span class="city">${i.city||''}</span>${mc!=null?`<span class="match-n" style="margin:0">🎯 ${mc.ok} ✅ • ${mc.no} ❌ • ${mc.unk} ❓</span>`:''}</div>
+      <div class="row"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${typeLabel(i.type)}</span><span class="city">${i.city||''}</span>${mc!=null?`<span class="match-n" style="margin:0">🎯 ${mc.ok} ✅ • ${mc.no} ❌ • ${mc.unk} ❓</span>`:''}</div>
       <div class="range">
-        ${rng(psy,'טווח פסיכומטרי (מינימום–מקסימום)','')}
-        ${rng(bag,'טווח ממוצע בגרות (מינימום–מקסימום)','')}
-        ${sec.length?rng(sec,'טווח סכם / התאמה (מינימום–מקסימום)',''):''}
-        <div class="rbox"><div class="l">מספר תארים</div><div class="v">${degs.length}</div></div>
+        ${rng(psy, t('rngPsy'), '')}
+        ${rng(bag, t('rngBag'), '')}
+        ${sec.length?rng(sec, t('rngSec'), ''):''}
+        <div class="rbox"><div class="l">${t('degCount')}</div><div class="v">${degs.length}</div></div>
       </div>
-      <div class="src">נתוני ${i.data_year||''} • מקור: ${i.source?`<a href="${i.source}" target="_blank" rel="noopener">האתר הרשמי</a>`:'האתר הרשמי'}</div>
+      <div class="src">${t('dataOf')} ${i.data_year||''} • ${t('source')}: ${i.source?`<a href="${i.source}" target="_blank" rel="noopener">${t('officialSite')}</a>`:t('officialSite')}</div>
       ${i.nodata?`<div class="nodata" style="font-size:14px">ℹ️ ${i.nodata}</div>`:''}
       ${odaysSmall(i)}${tuitHtml(i)}
     </div>
-    <div class="sec-t">📋 כל התארים ודרישות הסף</div>
-    ${MY?`<label class="filt"><input type="checkbox" id="onlyMine" ${onlyMine?'checked':''}> הצג רק תארים שמתאימים לי</label>`:''}
+    <div class="sec-t">${t('allDegrees')}</div>
+    ${MY?`<label class="filt"><input type="checkbox" id="onlyMine" ${onlyMine?'checked':''}> ${t('onlyMineInst')}</label>`:''}
     <div class="deg" id="degList">${degListHtml(degs, id)}</div>`;
   const cb = $('onlyMine');
   if(cb) cb.addEventListener('change', e=>{ onlyMine = e.target.checked; $('degList').innerHTML = degListHtml(degs, id); bindStars(v); });
@@ -472,32 +508,32 @@ function showInst(id){
 }
 function degListHtml(degs, instId){
   const list = onlyMine && MY ? degs.filter(d=>matchOf(d, instId)==='ok') : degs;
-  return list.map(d=>dcard(d, instId)).join('') || '<div class="empty">אין תארים מתאימים עם הנתונים שהזנת</div>';
+  return list.map(d=>dcard(d, instId)).join('') || '<div class="empty">' + t('noMatchEntered') + '</div>';
 }
 function subjLine(d){
   const s = d.subj || {};
-  const math = s.math_units != null ? `מתמטיקה: ${s.math_units} יח״ל${s.math_grade != null ? ' בציון ' + s.math_grade + ' ומעלה' : ' (ציון עובר)'}`
-    : (s.math_grade != null ? `מתמטיקה: ציון ${s.math_grade} ומעלה` : 'מתמטיקה: לא ידוע');
+  const math = s.math_units != null ? `${t('subjMath')}: ${s.math_units} ${t('subjUnits')}${s.math_grade != null ? ' ' + tf('subjGradeUp', {g: s.math_grade}) : ' ' + t('subjPass')}`
+    : (s.math_grade != null ? `${t('subjMath')}: ${tf('subjGradeOnly', {g: s.math_grade})}` : `${t('subjMath')}: ${t('subjUnknown')}`);
   let eng = null;
-  if(s.eng_units != null) eng = `אנגלית: ${s.eng_units} יח״ל${s.eng_grade != null ? ' בציון ' + s.eng_grade + ' ומעלה' : ' (ציון עובר)'}`;
-  else if(s.eng_grade != null) eng = `אנגלית: ציון ${s.eng_grade} ומעלה`;
-  if(s.eng_level) eng = (eng ? eng + ' • ' : 'אנגלית: ') + 'רמת ' + s.eng_level;
-  if(!eng) eng = 'אנגלית: לא ידוע';
+  if(s.eng_units != null) eng = `${t('subjEng')}: ${s.eng_units} ${t('subjUnits')}${s.eng_grade != null ? ' ' + tf('subjGradeUp', {g: s.eng_grade}) : ' ' + t('subjPass')}`;
+  else if(s.eng_grade != null) eng = `${t('subjEng')}: ${tf('subjGradeOnly', {g: s.eng_grade})}`;
+  if(s.eng_level) eng = (eng ? eng + ' • ' : `${t('subjEng')}: `) + t('subjLevel') + ' ' + s.eng_level;
+  if(!eng) eng = `${t('subjEng')}: ${t('subjUnknown')}`;
   return `📐 ${math} • ${eng}`;
 }
 function dcard(d, instId){
   const pv = fmt(d.psychometric), bv = fmt(d.bagrut), sv = fmt(d.sechem_min);
   const m = matchOf(d, instId);
   const blk = subjBlock(d);
-  const star = USER ? `<button class="star ${FAVS.has(favKey(instId, d.name))?'on':''}" data-fi="${instId}" data-fd="${escA(d.name)}" title="הוספה למועדפים">★</button>` : '';
+  const star = USER ? `<button class="star ${FAVS.has(favKey(instId, d.name))?'on':''}" data-fi="${instId}" data-fd="${escA(d.name)}" title="${t('starTitle')}">★</button>` : '';
   return `<div class="dcard" data-dname="${escA(d.name)}">
-    <div class="t"><h4>${d.name}</h4>${d.title?`<span class="tt">${d.title}</span>`:''}${star}${m?MBADGE[m]:''}</div>
+    <div class="t"><h4>${d.name}</h4>${d.title?`<span class="tt">${d.title}</span>`:''}${star}${m?badgeHtml(m):''}</div>
     <div class="vals">
-      <div class="val ${pv==null?'na':''}"><div class="l">פסיכומטרי</div><div class="n">${pv==null?'לא פורסם':pv}</div></div>
-      <div class="val ${bv==null?'na':''}"><div class="l">ממוצע בגרות</div><div class="n">${bv==null?'לא פורסם':bv}</div></div>
-      ${sv!=null?`<div class="val"><div class="l">סכם / התאמה נדרש</div><div class="n">${sv}</div></div>`:''}
+      <div class="val ${pv==null?'na':''}"><div class="l">${t('psy')}</div><div class="n">${pv==null?t('notPublished'):pv}</div></div>
+      <div class="val ${bv==null?'na':''}"><div class="l">${t('bagAvg')}</div><div class="n">${bv==null?t('notPublished'):bv}</div></div>
+      ${sv!=null?`<div class="val"><div class="l">${t('sechemReq')}</div><div class="n">${sv}</div></div>`:''}
     </div>
-    ${blk.length?`<div class="blockline">🚫 חסום עבורך: ${blk.join(' • ')}</div>`:''}
+    ${blk.length?`<div class="blockline">${t('blockedForYou')}${blk.join(' • ')}</div>`:''}
     <div class="subjline">${subjLine(d)}</div>
     ${d.notes?`<div class="notes">${d.notes}</div>`:''}
   </div>`;
@@ -525,13 +561,13 @@ function onSearch(e){
     const showRow = im && !dm.length && !(onlyMine && MY);
     if(dm.length || showRow){
       groups += `<div class="res-group"><h3>${i.name}</h3>`;
-      if(showRow) groups += `<div class="res-item" data-id="${i.id}">פתיחת דף המוסד<small>${(i.degrees||[]).length} תארים</small></div>`;
-      dm.forEach(d=>{ groups += `<div class="res-item" data-id="${i.id}" data-deg="${escA(d.name)}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'-'} • בגרות: ${fmt(d.bagrut)??'-'}</small></div>`; });
+      if(showRow) groups += `<div class="res-item" data-id="${i.id}">${t('openInstPage')}<small>${tf('degShort', {n: (i.degrees||[]).length})}</small></div>`;
+      dm.forEach(d=>{ groups += `<div class="res-item" data-id="${i.id}" data-deg="${escA(d.name)}">🎓 ${d.name}<small>${t('psy')}: ${fmt(d.psychometric)??'-'} • ${t('bagShort')}: ${fmt(d.bagrut)??'-'}</small></div>`; });
       groups += '</div>';
     }
   });
-  const filt = MY ? `<label class="filt"><input type="checkbox" id="onlyMineSearch" ${onlyMine?'checked':''}> הצג רק מה שמתאים לציונים שלי</label>` : '';
-  R.innerHTML = filt + (groups || `<div class="empty">${onlyMine && MY ? 'אין תארים מתאימים עם הנתונים שהזנת' : 'לא נמצאו תוצאות'}</div>`);
+  const filt = MY ? `<label class="filt"><input type="checkbox" id="onlyMineSearch" ${onlyMine?'checked':''}> ${t('onlyMineSearch')}</label>` : '';
+  R.innerHTML = filt + (groups || `<div class="empty">${onlyMine && MY ? t('noMatchEntered') : t('noResults')}</div>`);
   const scb = $('onlyMineSearch');
   if(scb) scb.addEventListener('change', e=>{ onlyMine = e.target.checked; onSearch({target: $('q')}); });
   R.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click',()=>{
@@ -552,14 +588,14 @@ function buildSugg(){
   if(q.length<2){ hideSugg(); return; }
   const nq = normH(q); const insts = [], degs = [];
   DATA.institutions.forEach(i=>{
-    if(normH(i.name).includes(nq)) insts.push({t:'i', id:i.id, label:i.name, sub:(i.degrees||[]).length+' תארים'});
+    if(normH(i.name).includes(nq)) insts.push({t:'i', id:i.id, label:i.name, sub:tf('degShort', {n: (i.degrees||[]).length})});
     (i.degrees||[]).forEach(d=>{ if(normH(d.name).includes(nq)) degs.push({t:'d', id:i.id, deg:d.name, label:d.name, sub:i.name}); });
   });
   let items = [...insts, ...degs];
   if(items.length<4 && nq.length>=4){
     const fuzzy = [];
     DATA.institutions.forEach(i=>{
-      if(!insts.some(x=>x.id===i.id) && lev(nq, normH(i.name))<=2) fuzzy.push({t:'i', id:i.id, label:i.name, sub:(i.degrees||[]).length+' תארים'});
+      if(!insts.some(x=>x.id===i.id) && lev(nq, normH(i.name))<=2) fuzzy.push({t:'i', id:i.id, label:i.name, sub:tf('degShort', {n: (i.degrees||[]).length})});
       (i.degrees||[]).forEach(d=>{ const nd = normH(d.name); if(!degs.some(x=>x.id===i.id && x.deg===d.name) && (lev(nq, nd)<=2 || (!nq.includes(' ') && nd.split(' ').some(w=>w.length>=4 && lev(nq, w)<=1)))) fuzzy.push({t:'d', id:i.id, deg:d.name, label:d.name, sub:i.name}); });
     });
     items = [...items, ...fuzzy];
@@ -576,7 +612,14 @@ function pickSugg(ix){
   if(x.t==='d'){ window._noTopScroll = true; showInst(x.id); window._noTopScroll = false; jumpToDegree(x.deg); }
   else showInst(x.id);
 }
-const AREA_NAMES = {cs:'מחשבים וטכנולוגיה', eng:'הנדסה', health:'רפואה ומקצועות הבריאות', science:'מדעי הטבע ומדעים מדויקים', business:'עסקים, כלכלה וניהול', law:'משפטים', society:'מדעי החברה והרוח', edu:'חינוך והוראה', art:'אמנות, עיצוב ויצירה'};
+const AREA_ALL = {
+he: {cs:'מחשבים וטכנולוגיה', eng:'הנדסה', health:'רפואה ומקצועות הבריאות', science:'מדעי הטבע ומדעים מדויקים', business:'עסקים, כלכלה וניהול', law:'משפטים', society:'מדעי החברה והרוח', edu:'חינוך והוראה', art:'אמנות, עיצוב ויצירה'},
+en: {cs:'Computing & Technology', eng:'Engineering', health:'Medicine & Health Professions', science:'Natural & Exact Sciences', business:'Business, Economics & Management', law:'Law', society:'Social Sciences & Humanities', edu:'Education & Teaching', art:'Art, Design & Creation'},
+ru: {cs:'Компьютеры и технологии', eng:'Инженерия', health:'Медицина и профессии здравоохранения', science:'Естественные и точные науки', business:'Бизнес, экономика и управление', law:'Право', society:'Общественные и гуманитарные науки', edu:'Образование и преподавание', art:'Искусство, дизайн и творчество'},
+fr: {cs:'Informatique et technologie', eng:'Ingénierie', health:'Médecine et professions de santé', science:'Sciences naturelles et exactes', business:'Affaires, économie et management', law:'Droit', society:'Sciences sociales et humaines', edu:'Éducation et enseignement', art:'Art, design et création'},
+ar: {cs:'الحوسبة والتكنولوجيا', eng:'الهندسة', health:'الطب والمهن الصحية', science:'العلوم الطبيعية والدقيقة', business:'الأعمال والاقتصاد والإدارة', law:'القانون', society:'العلوم الاجتماعية والإنسانية', edu:'التربية والتعليم', art:'الفن والتصميم والإبداع'}
+};
+let AREA_NAMES = AREA_ALL[LANG] || AREA_ALL.he;
 const AREA_KW = {
   cs:['מדעי המחשב','הנדסת תוכנה','מערכות מידע','בינה מלאכותית','מדעי הנתונים','הנדסת מחשבים','סייבר','הנדסת נתונים','לימודי מידע','הייטק'],
   eng:['הנדס'],
@@ -588,7 +631,8 @@ const AREA_KW = {
   edu:['חינוך','הוראה','גיל הרך','לקויות למידה','ייעוץ חינוכי'],
   art:['עיצוב','אמנות','אמנויות','אדריכלות','ארכיטקטורה','מוסיקה','מוזיקה','קולנוע','צילום','אנימציה','תיאטרון','מחול','תקשורת חזותית','אופנה','תכשיטים','קרמיקה','צורפות']
 };
-const QUIZ_Q = [
+const QUIZ_ALL = {
+he: [
   {q:'מה הכי מושך אותך?', opts:[
     {t:'💻 טכנולוגיה, מחשבים וחדשנות', w:{cs:3}},
     {t:'🏗️ לבנות, לתכנן ולהנדס', w:{eng:3}},
@@ -624,7 +668,157 @@ const QUIZ_Q = [
     {t:'יצירתי ופתוח', w:{art:3, society:1}},
     {t:'עם אנשים, בקבוצות ובפרויקטים', w:{edu:2, business:1, society:1}}
   ]}
-];
+],
+en: [
+  {q:'What attracts you most?', opts:[
+    {t:'💻 Technology, computers and innovation', w:{cs:3}},
+    {t:'🏗️ Building, planning and engineering', w:{eng:3}},
+    {t:'🩺 The human body, health and medicine', w:{health:3}},
+    {t:'🧠 Understanding people, society and behavior', w:{society:2, edu:1}},
+    {t:'💰 Money, business and management', w:{business:3}},
+    {t:'🎨 Creating, designing and expressing', w:{art:3}},
+    {t:'🔬 Exploring nature and the universe', w:{science:3}},
+    {t:'⚖️ Justice, law and state', w:{law:3, society:1}}
+  ]},
+  {q:'How are you with math and numbers?', opts:[
+    {t:'Strong, and I love it', w:{cs:2, eng:2, science:2, business:1}},
+    {t:'Fine, I manage', w:{cs:1, eng:1, business:1, health:1}},
+    {t:'Prefer as little as possible', w:{society:2, art:2, law:1, edu:1, eng:-2, cs:-1}}
+  ]},
+  {q:'Where do you see yourself working?', opts:[
+    {t:'In an office, at a computer', w:{cs:2, business:2}},
+    {t:'In a hospital or clinic', w:{health:3}},
+    {t:'Outdoors, in the field, on the move', w:{eng:2, science:1, society:1}},
+    {t:'With people: guiding, mentoring and caring', w:{edu:2, society:2, health:1}},
+    {t:'In a studio or workshop', w:{art:3}},
+    {t:'In a research lab', w:{science:3, health:1}}
+  ]},
+  {q:'What matters most to you in a degree?', opts:[
+    {t:'A clear profession in demand', w:{eng:2, cs:2, health:2, business:1}},
+    {t:'Studying a subject that truly fascinates me', w:{science:2, society:2, art:1}},
+    {t:'Helping people and the community', w:{health:2, society:2, edu:2}},
+    {t:'Leading, managing and influencing', w:{business:2, law:2, society:1}}
+  ]},
+  {q:'What study style suits you?', opts:[
+    {t:'Practical and applied', w:{eng:2, cs:1, business:1, health:1}},
+    {t:'Theoretical, research-oriented and deep', w:{science:2, society:1, law:1}},
+    {t:'Creative and open', w:{art:3, society:1}},
+    {t:'With people, in groups and projects', w:{edu:2, business:1, society:1}}
+  ]}
+],
+ru: [
+  {q:'Что привлекает вас больше всего?', opts:[
+    {t:'💻 Технологии, компьютеры и инновации', w:{cs:3}},
+    {t:'🏗️ Строить, проектировать и конструировать', w:{eng:3}},
+    {t:'🩺 Человеческое тело, здоровье и медицина', w:{health:3}},
+    {t:'🧠 Понимать людей, общество и поведение', w:{society:2, edu:1}},
+    {t:'💰 Деньги, бизнес и управление', w:{business:3}},
+    {t:'🎨 Творить, проектировать и самовыражаться', w:{art:3}},
+    {t:'🔬 Исследовать природу и вселенную', w:{science:3}},
+    {t:'⚖️ Справедливость, право и государство', w:{law:3, society:1}}
+  ]},
+  {q:'Как у вас с математикой и числами?', opts:[
+    {t:'Сильно, и мне нравится', w:{cs:2, eng:2, science:2, business:1}},
+    {t:'Нормально, справляюсь', w:{cs:1, eng:1, business:1, health:1}},
+    {t:'Предпочитаю как можно меньше', w:{society:2, art:2, law:1, edu:1, eng:-2, cs:-1}}
+  ]},
+  {q:'Где вы видите себя за работой?', opts:[
+    {t:'В офисе, за компьютером', w:{cs:2, business:2}},
+    {t:'В больнице или клинике', w:{health:3}},
+    {t:'На улице, в поле, в движении', w:{eng:2, science:1, society:1}},
+    {t:'С людьми: сопровождение, обучение и помощь', w:{edu:2, society:2, health:1}},
+    {t:'В студии или мастерской', w:{art:3}},
+    {t:'В исследовательской лаборатории', w:{science:3, health:1}}
+  ]},
+  {q:'Что для вас важнее всего в учёбе?', opts:[
+    {t:'Понятная и востребованная профессия', w:{eng:2, cs:2, health:2, business:1}},
+    {t:'Изучать то, что по-настоящему увлекает', w:{science:2, society:2, art:1}},
+    {t:'Помогать людям и обществу', w:{health:2, society:2, edu:2}},
+    {t:'Вести, управлять и влиять', w:{business:2, law:2, society:1}}
+  ]},
+  {q:'Какой стиль учёбы вам подходит?', opts:[
+    {t:'Практический и прикладной', w:{eng:2, cs:1, business:1, health:1}},
+    {t:'Теоретический, исследовательский и глубокий', w:{science:2, society:1, law:1}},
+    {t:'Творческий и открытый', w:{art:3, society:1}},
+    {t:'С людьми, в группах и проектах', w:{edu:2, business:1, society:1}}
+  ]}
+],
+fr: [
+  {q:"Qu'est-ce qui vous attire le plus ?", opts:[
+    {t:'💻 Technologie, informatique et innovation', w:{cs:3}},
+    {t:'🏗️ Construire, concevoir et ingénierie', w:{eng:3}},
+    {t:'🩺 Le corps humain, la santé et la médecine', w:{health:3}},
+    {t:'🧠 Comprendre les gens, la société et le comportement', w:{society:2, edu:1}},
+    {t:'💰 Argent, affaires et management', w:{business:3}},
+    {t:'🎨 Créer, designer et exprimer', w:{art:3}},
+    {t:'🔬 Explorer la nature et l’univers', w:{science:3}},
+    {t:'⚖️ Justice, droit et État', w:{law:3, society:1}}
+  ]},
+  {q:'Comment êtes-vous en maths et en chiffres ?', opts:[
+    {t:"Fort, et j'adore", w:{cs:2, eng:2, science:2, business:1}},
+    {t:"Ça va, je m'en sors", w:{cs:1, eng:1, business:1, health:1}},
+    {t:'Le moins possible', w:{society:2, art:2, law:1, edu:1, eng:-2, cs:-1}}
+  ]},
+  {q:'Où vous voyez-vous travailler ?', opts:[
+    {t:'Dans un bureau, devant un ordinateur', w:{cs:2, business:2}},
+    {t:'Dans un hôpital ou une clinique', w:{health:3}},
+    {t:'Dehors, sur le terrain, en mouvement', w:{eng:2, science:1, society:1}},
+    {t:'Avec des gens : accompagner, guider et soigner', w:{edu:2, society:2, health:1}},
+    {t:'Dans un studio ou un atelier', w:{art:3}},
+    {t:'Dans un laboratoire de recherche', w:{science:3, health:1}}
+  ]},
+  {q:"Qu'est-ce qui compte le plus pour vous dans un diplôme ?", opts:[
+    {t:'Un métier clair et demandé', w:{eng:2, cs:2, health:2, business:1}},
+    {t:'Étudier un sujet qui me passionne vraiment', w:{science:2, society:2, art:1}},
+    {t:'Aider les gens et la communauté', w:{health:2, society:2, edu:2}},
+    {t:'Diriger, gérer et influencer', w:{business:2, law:2, society:1}}
+  ]},
+  {q:"Quel style d'études vous convient ?", opts:[
+    {t:'Pratique et appliqué', w:{eng:2, cs:1, business:1, health:1}},
+    {t:'Théorique, recherche et approfondi', w:{science:2, society:1, law:1}},
+    {t:'Créatif et ouvert', w:{art:3, society:1}},
+    {t:'Avec des gens, en groupes et en projets', w:{edu:2, business:1, society:1}}
+  ]}
+],
+ar: [
+  {q:'ما الذي يجذبك أكثر؟', opts:[
+    {t:'💻 التكنولوجيا والحواسيب والابتكار', w:{cs:3}},
+    {t:'🏗️ البناء والتخطيط والهندسة', w:{eng:3}},
+    {t:'🩺 جسم الإنسان والصحة والطب', w:{health:3}},
+    {t:'🧠 فهم الناس والمجتمع والسلوك', w:{society:2, edu:1}},
+    {t:'💰 المال والأعمال والإدارة', w:{business:3}},
+    {t:'🎨 الإبداع والتصميم والتعبير', w:{art:3}},
+    {t:'🔬 استكشاف الطبيعة والكون', w:{science:3}},
+    {t:'⚖️ العدالة والقانون والدولة', w:{law:3, society:1}}
+  ]},
+  {q:'كيف أنت مع الرياضيات والأرقام؟', opts:[
+    {t:'قوي وأحبها', w:{cs:2, eng:2, science:2, business:1}},
+    {t:'لا بأس، أتدبر أمري', w:{cs:1, eng:1, business:1, health:1}},
+    {t:'أفضل أقل ما يمكن', w:{society:2, art:2, law:1, edu:1, eng:-2, cs:-1}}
+  ]},
+  {q:'أين ترى نفسك تعمل؟', opts:[
+    {t:'في مكتب، أمام حاسوب', w:{cs:2, business:2}},
+    {t:'في مستشفى أو عيادة', w:{health:3}},
+    {t:'في الخارج والميدان والحركة', w:{eng:2, science:1, society:1}},
+    {t:'مع الناس: مرافقة وإرشاد وعلاج', w:{edu:2, society:2, health:1}},
+    {t:'في استوديو أو ورشة إبداع', w:{art:3}},
+    {t:'في مختبر أبحاث', w:{science:3, health:1}}
+  ]},
+  {q:'ما الأهم بالنسبة لك في الدرجة؟', opts:[
+    {t:'مهنة واضحة ومطلوبة في سوق العمل', w:{eng:2, cs:2, health:2, business:1}},
+    {t:'دراسة موضوع يثير اهتمامي حقا', w:{science:2, society:2, art:1}},
+    {t:'مساعدة الناس والمجتمع', w:{health:2, society:2, edu:2}},
+    {t:'القيادة والإدارة والتأثير', w:{business:2, law:2, society:1}}
+  ]},
+  {q:'ما أسلوب الدراسة المناسب لك؟', opts:[
+    {t:'عملي وتطبيقي', w:{eng:2, cs:1, business:1, health:1}},
+    {t:'نظري وبحثي ومعمق', w:{science:2, society:1, law:1}},
+    {t:'إبداعي ومفتوح', w:{art:3, society:1}},
+    {t:'مع الناس، في مجموعات ومشاريع', w:{edu:2, business:1, society:1}}
+  ]}
+]
+};
+let QUIZ_Q = QUIZ_ALL[LANG] || QUIZ_ALL.he;
 let QZ = null;
 function degAreas(name){ return Object.keys(AREA_KW).filter(a=>AREA_KW[a].some(k=>name.includes(k))); }
 function buildQuiz(){ QZ = {step:0, score:{}, hist:[]}; renderQz(); }
@@ -632,12 +826,12 @@ function renderQz(){
   const v = $('quizView');
   if(QZ.step >= QUIZ_Q.length){ renderQzResults(); return; }
   const it = QUIZ_Q[QZ.step];
-  v.innerHTML = `<div class="qz-wrap"><div class="sec-t">🧭 איזה תואר מתאים לי</div>
-    <div style="color:var(--dim);font-size:14px">שאלה ${QZ.step+1} מתוך ${QUIZ_Q.length}</div>
+  v.innerHTML = `<div class="qz-wrap"><div class="sec-t">${t('quizTitle')}</div>
+    <div style="color:var(--dim);font-size:14px">${tf('qOf', {a: QZ.step+1, b: QUIZ_Q.length})}</div>
     <div class="qz-prog"><i style="width:${QZ.step/QUIZ_Q.length*100}%"></i></div>
     <div class="qz-q">${it.q}</div>
     <div class="qz-opts">${it.opts.map((o,ix)=>`<button class="qz-opt" data-ix="${ix}">${o.t}</button>`).join('')}</div>
-    ${QZ.step>0?'<button class="pbtn clear" id="qzBack" style="margin-top:14px">→ חזרה לשאלה הקודמת</button>':''}</div>`;
+    ${QZ.step>0?'<button class="pbtn clear" id="qzBack" style="margin-top:14px">' + t('qBack') + '</button>':''}</div>`;
   v.querySelectorAll('.qz-opt').forEach(b=>b.addEventListener('click', ()=>{
     const o = QUIZ_Q[QZ.step].opts[+b.dataset.ix];
     Object.entries(o.w).forEach(([a,pts])=>{ QZ.score[a] = (QZ.score[a]||0) + pts; });
@@ -650,26 +844,26 @@ function renderQzResults(){
   const v = $('quizView');
   const top = Object.entries(QZ.score).filter(([,s])=>s>0).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const rank = m => m==='ok'?0 : m==='unk'?1 : m==='no'?2 : 3;
-  let h = '<div class="qz-wrap"><div class="sec-t">🧭 התוצאות שלך</div>';
-  h += MY ? '<p style="color:var(--dim)">התארים מסומנים לפי הציונים שלך: ✅ מתאים • ❌ לא מתאים • ❓ חסר ציון לבדיקה, והמתאימים מופיעים ראשונים.</p>'
-          : '<p style="color:var(--dim)">טיפ: הזן את הציונים שלך בכפתור "🎯 הציונים שלי" בראש העמוד, וחזור לכאן כדי לראות ליד כל תואר אם אתה עומד בסף.</p>';
+  let h = '<div class="qz-wrap"><div class="sec-t">' + t('quizResults') + '</div>';
+  h += MY ? '<p style="color:var(--dim)">' + t('qTipMy') + '</p>'
+          : '<p style="color:var(--dim)">' + t('qTipNoMy') + '</p>';
   top.forEach(([a])=>{
     const pool = [];
     DATA.institutions.forEach(i=>{ (i.degrees||[]).forEach(d=>{ if(degAreas(d.name).includes(a)) pool.push({d, i}); }); });
     pool.sort((x,y)=> MY ? rank(matchOf(x.d, x.i.id)) - rank(matchOf(y.d, y.i.id)) : (x.i.type===y.i.type ? x.d.name.localeCompare(y.d.name) : (x.i.type==='אוניברסיטה' ? -1 : 1)));
     h += `<div class="sec-t" style="margin-top:22px">${AREA_NAMES[a]}</div>`;
-    if(!pool.length) h += '<div class="empty">אין תארים בתחום זה</div>';
+    if(!pool.length) h += '<div class="empty">' + t('noDegreesArea') + '</div>';
     pool.slice(0,10).forEach(({d, i})=>{
       const m = matchOf(d, i.id);
-      h += `<div class="qz-row" data-inst="${i.id}" data-deg="${escA(d.name)}"><span>🎓 ${d.name}${m?MBADGE[m]:''}<br><small style="white-space:normal">${i.name}</small></span><small>פסיכומטרי: ${fmt(d.psychometric)??'לא פורסם'} • בגרות: ${fmt(d.bagrut)??'לא פורסם'}${d.sechem_min!=null?' • סכם: '+fmt(d.sechem_min):''}</small></div>`;
+      h += `<div class="qz-row" data-inst="${i.id}" data-deg="${escA(d.name)}"><span>🎓 ${d.name}${m?badgeHtml(m):''}<br><small style="white-space:normal">${i.name}</small></span><small>${t('psy')}: ${fmt(d.psychometric)??t('notPublished')} • ${t('bagShort')}: ${fmt(d.bagrut)??t('notPublished')}${d.sechem_min!=null?' • ' + t('secShort') + ': '+fmt(d.sechem_min):''}</small></div>`;
     });
   });
-  h += '<button class="pbtn save" id="qzAgain" style="margin-top:18px">🔄 מילוי השאלון מחדש</button></div>';
+  h += '<button class="pbtn save" id="qzAgain" style="margin-top:18px">' + t('qAgain') + '</button></div>';
   v.innerHTML = h;
   v.querySelectorAll('.qz-row').forEach(r=>r.addEventListener('click', ()=>{ window._noTopScroll = true; showInst(r.dataset.inst); window._noTopScroll = false; jumpToDegree(r.dataset.deg); }));
   $('qzAgain').addEventListener('click', buildQuiz);
 }
-function openAuth(){ if(!SB){ alert('שירות הכניסה אינו זמין כרגע'); return; } $('authModal').classList.add('open'); }
+function openAuth(){ if(!SB){ alert(t('loginUnavailable')); return; } $('authModal').classList.add('open'); }
 function closeAuth(){ const m = $('authModal'); if(!m) return; m.classList.remove('open'); $('stepCode').style.display='none'; $('stepMain').style.display='block'; }
 function bindAuth(){
   $('authBtn').addEventListener('click', async ()=>{ if(USER){ try{ await SB.auth.signOut(); }catch(e){} } else openAuth(); });
@@ -678,10 +872,10 @@ function bindAuth(){
   $('gLogin').addEventListener('click', async ()=>{ try{ await SB.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.href.split('#')[0]}}); }catch(e){} });
   $('sendCode').addEventListener('click', async ()=>{
     const em = $('authEmail').value.trim();
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ $('authMsg').textContent = 'הזן כתובת מייל תקינה'; return; }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ $('authMsg').textContent = t('invalidEmail'); return; }
     const {error} = await SB.auth.signInWithOtp({email: em, options: {emailRedirectTo: location.href.split('#')[0]}});
-    if(error){ $('authMsg').textContent = 'שגיאה בשליחה. נסה שוב בעוד רגע.'; return; }
-    $('authMsg').textContent = 'הקישור נשלח ל-' + em;
+    if(error){ $('authMsg').textContent = t('sendError'); return; }
+    $('authMsg').textContent = t('linkSent') + em;
     $('stepMain').style.display='none'; $('stepCode').style.display='block';
   });
   $('closeAfterSend').addEventListener('click', closeAuth);
@@ -697,12 +891,12 @@ function setUser(u){
   const b = $('authBtn'); if(!b) return;
   if(u){
     WAS_AUTH = true;
-    b.textContent = 'יציאה (' + (u.email || 'מחובר') + ')';
+    b.textContent = t('logout') + ' (' + (u.email || t('connected')) + ')';
     $('featBar').classList.remove('locked');
     loadFavs().then(()=>{ if($('instView').style.display !== 'none') refreshView(); });
     loadMyScores();
   } else {
-    b.textContent = '🔐 כניסה';
+    b.textContent = t('login');
     $('featBar').classList.add('locked');
     FAVS = new Set();
     if(WAS_AUTH){
@@ -710,7 +904,7 @@ function setUser(u){
       MY = null; onlyMine = false;
       try{ localStorage.removeItem('adm_my'); }catch(e){}
       const mb = $('myBtn');
-      if(mb){ mb.classList.remove('on'); mb.textContent = '🎯 הציונים שלי'; }
+      if(mb){ mb.classList.remove('on'); mb.textContent = t('myScores'); }
       const ip = $('inPsy'), ib = $('inBag');
       if(ip) ip.value = ''; if(ib) ib.value = '';
       ['inMu','inMg','inEu','inEg'].forEach(id=>{ const el = $(id); if(el) el.value = ''; });
@@ -783,7 +977,7 @@ async function loadMyScores(){
         eu: data.eng_units != null ? Number(data.eng_units) : null, eg: data.eng_grade != null ? Number(data.eng_grade) : null};
       try{ localStorage.setItem('adm_my', JSON.stringify(MY)); }catch(e){}
       const b = $('myBtn');
-      if(b){ b.classList.toggle('on', true); b.textContent = '🎯 הציונים שלי ✓'; }
+      if(b){ b.classList.toggle('on', true); b.textContent = t('myScoresOn'); }
       $('inPsy').value = MY.psy ?? ''; $('inBag').value = MY.bag ?? '';
       $('inMu').value = MY.mu ?? ''; $('inMg').value = MY.mg ?? '';
       $('inEu').value = MY.eu ?? ''; $('inEg').value = MY.eg ?? '';
@@ -802,69 +996,69 @@ async function pushMyScores(){
 }
 function calcSehem(i, psy, bag){
   const r2 = n => Math.round(n * 100) / 100;
-  if(psy == null) return {err: 'דרוש ציון פסיכומטרי לחישוב'};
-  const needBag = {err: 'דרוש גם ממוצע בגרות לחישוב'};
+  if(psy == null) return {errK: 'errPsy'};
+  const needBag = {errK: 'errBag'};
   switch(i.id){
     case 'huji':
       if(bag == null) return needBag;
-      return {score: r2((0.3 * ((bag / 10) * 3.963 - 20.0621) + 0.7 * (psy * 0.032073 + 0.3672)) * 1.2235 - 4.4598), scale: 'ציון משוקלל, סולם 10-30 בקירוב', exact: true, det: 'לפי הנוסחה הרשמית של האוניברסיטה העברית: תקנון בגרות (הממוצע בסולם 11.52) ותקנון פסיכומטרי, בשקלול 30% בגרות ו-70% פסיכומטרי. בחוגים עם "ריבוי משוקללים" נלקח הגבוה מבין שקלול זה לשקלול 50/50.'};
+      return {score: r2((0.3 * ((bag / 10) * 3.963 - 20.0621) + 0.7 * (psy * 0.032073 + 0.3672)) * 1.2235 - 4.4598), sk: 'scaleHuji', exact: true, dk: 'detHuji'};
     case 'tau':
       if(bag == null) return needBag;
-      return {score: r2(0.52 * ((bag * 9.62 - 349.9) + psy) - 43.10), scale: 'סולם פסיכומטרי, 200-800', exact: true, det: 'ציון התאמה לפי הנוסחה הרשמית של אוניברסיטת תל אביב. למדעים מדויקים והנדסה תיתכן תוספת בונוס על מתמטיקה ופיזיקה 5 יחידות.'};
+      return {score: r2(0.52 * ((bag * 9.62 - 349.9) + psy) - 43.10), sk: 'scalePsy', exact: true, dk: 'detTau'};
     case 'ariel': case 'hadassah': case 'gordon':
       if(bag == null) return needBag;
-      return {score: r2(((bag * 6.666) + psy) / 2), scale: 'סולם פסיכומטרי, 200-800', exact: true, det: 'ציון משולב = ממוצע של ציון הפסיכומטרי וממוצע הבגרות כשהוא מומר לסולם פסיכומטרי.'};
+      return {score: r2(((bag * 6.666) + psy) / 2), sk: 'scalePsy', exact: true, dk: 'detCombined'};
     case 'telhai':
       if(bag == null) return needBag;
-      return {score: r2(((bag * 6.666) + psy) / 2), scale: 'סולם פסיכומטרי, 200-800', exact: false, det: 'המוסד מפרסם ציון משוקלל שהוא ממוצע של שני הרכיבים, בלי פירוט אריתמטי מלא - התוצאה הערכה.'};
+      return {score: r2(((bag * 6.666) + psy) / 2), sk: 'scalePsy', exact: false, dk: 'detTelhai'};
     case 'jct':
       if(bag == null) return needBag;
-      return {score: r2(0.02 * psy + 0.35 * bag + 35.7), scale: 'סולם 0-100', exact: true, det: 'ציון התאמה לפי נוסחת המרכז האקדמי לב.'};
+      return {score: r2(0.02 * psy + 0.35 * bag + 35.7), sk: 'scale100', exact: true, dk: 'detJct'};
     case 'haifa':
       if(bag == null) return needBag;
-      return {score: r2(0.75 * psy + 0.25 * (bag * 6.666)), scale: 'סולם פסיכומטרי, 200-800', exact: false, det: 'השקלול הרשמי: 75% פסיכומטרי ו-25% בגרות. המרת הבגרות המדויקת לסולם נעשית במחשבון הרשמי של האוניברסיטה - התוצאה כאן הערכה.'};
+      return {score: r2(0.75 * psy + 0.25 * (bag * 6.666)), sk: 'scalePsy', exact: false, dk: 'detHaifa'};
     case 'bgu':
       if(bag == null) return needBag;
-      return {score: r2(0.5 * psy + 0.5 * (bag * 6.666)), scale: 'סולם פסיכומטרי, 200-800', exact: false, det: 'השקלול הרשמי: 50% פסיכומטרי ו-50% בגרות, לפני בונוסים (למשל מתמטיקה 5 יחידות). ההמרה המדויקת נעשית במחשבון הרשמי - התוצאה כאן הערכה.'};
+      return {score: r2(0.5 * psy + 0.5 * (bag * 6.666)), sk: 'scalePsy', exact: false, dk: 'detBgu'};
     case 'sapir':
       if(bag == null) return needBag;
-      return {score: r2(0.075 * psy + 0.5 * bag), scale: 'סולם משולב', exact: false, det: 'הנוסחה פורסמה עבור משפטים בלבד. במחלקות אחרות חלים ספי קבלה נפרדים.'};
+      return {score: r2(0.075 * psy + 0.5 * bag), sk: 'scalePsy', exact: false, dk: 'detSapir'};
     default:
-      return {none: true, det: (i.sechem && i.sechem.note) ? i.sechem.note : 'המוסד אינו מפרסם נוסחת סכם. הקבלה נעשית לפי ספי פסיכומטרי ובגרות נפרדים, כפי שמופיעים ברשימת התארים בעמוד המוסד.'};
+      return (i.sechem && i.sechem.note) ? {none: true, draw: i.sechem.note} : {none: true, dk: 'detNoFormula'};
   }
 }
 function buildCalc(){
   const v = $('calcView');
   const opts = DATA.institutions.map(i=>`<option value="${i.id}">${i.name}</option>`).join('');
-  v.innerHTML = `<button class="back" onclick="goHome()">→ חזרה לכל המוסדות</button>
-  <div class="sec-t">🧮 מחשבונים</div>
+  v.innerHTML = `<button class="back" onclick="goHome()">${t('backAll')}</button>
+  <div class="sec-t">${t('calculators')}</div>
   <div class="pills" style="margin:0 0 14px">
-    <button class="pill active" id="tabSechem">ציון סכם / התאמה</button>
-    <button class="pill" id="tabBag">ממוצע בגרות משוקלל</button>
+    <button class="pill active" id="tabSechem">${t('tabSechem')}</button>
+    <button class="pill" id="tabBag">${t('tabBag')}</button>
   </div>
   <div id="sechemPane">
   <div class="fcard">
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-      <div class="fld"><label>מוסד</label><select id="calcInst" style="padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px">${opts}</select></div>
-      <div class="fld"><label>ציון פסיכומטרי</label><input id="calcPsy" type="number" min="200" max="800" placeholder="620"></div>
-      <div class="fld"><label>ממוצע בגרות</label><input id="calcBag" type="number" min="0" max="120" step="0.1" placeholder="95"></div>
-      <button class="pbtn save" id="calcGo">חשב</button>
+      <div class="fld"><label>${t('lblInst')}</label><select id="calcInst" style="padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px">${opts}</select></div>
+      <div class="fld"><label>${t('lblPsy')}</label><input id="calcPsy" type="number" min="200" max="800" placeholder="620"></div>
+      <div class="fld"><label>${t('lblBag')}</label><input id="calcBag" type="number" min="0" max="120" step="0.1" placeholder="95"></div>
+      <button class="pbtn save" id="calcGo">${t('calcBtn')}</button>
     </div>
     <div id="calcOut"></div>
-    <div class="locknote">החישוב מבוסס על נוסחאות שפרסמו המוסדות באתריהם הרשמיים. כשמצוין "הערכה" - הנוסחה המלאה קיימת רק במחשבון הרשמי של המוסד.</div>
+    <div class="locknote">${t('calcNote')}</div>
   </div>
   </div>
   <div id="bagPane" style="display:none">
   <div class="fcard">
-    <div class="fld" style="margin-bottom:12px"><label>מוסד (קובע את שיטת הבונוסים)</label><select id="bagInst" style="padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px">${opts}</select></div>
-    <div style="font-size:13.5px;color:var(--mut);margin-bottom:10px">הזן את מקצועות הבגרות שלך. מקצועות חובה לא יושמטו בחישוב האופטימלי; מקצועות בחירה שמורידים את הממוצע יושמטו אוטומטית, כל עוד נשארות לפחות 20 יחידות לימוד.</div>
+    <div class="fld" style="margin-bottom:12px"><label>${t('bagInstLbl')}</label><select id="bagInst" style="padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px">${opts}</select></div>
+    <div style="font-size:13.5px;color:var(--mut);margin-bottom:10px">${t('bagIntro')}</div>
     <div id="bagRows"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
-      <button class="pbtn clear" id="addRow">+ הוסף מקצוע</button>
-      <button class="pbtn save" id="bagGo">חשב ממוצע</button>
+      <button class="pbtn clear" id="addRow">${t('addSubject')}</button>
+      <button class="pbtn save" id="bagGo">${t('calcAvg')}</button>
     </div>
     <div id="bagOut"></div>
-    <div class="locknote">שיטות הבונוסים לפי פרסומים רשמיים של המוסדות. כשמצוין "הערכה" - המוסד לא מפרסם שיטה רשמית והחישוב הוא לפי השיטה הסטנדרטית.</div>
+    <div class="locknote">${t('bagNote')}</div>
   </div>
   </div>`;
   $('calcGo').addEventListener('click', runCalc);
@@ -882,19 +1076,26 @@ function switchCalcTab(t){
   $('tabSechem').classList.toggle('active', t === 's');
   $('tabBag').classList.toggle('active', t === 'b');
 }
+const CATS = {
+  he: {other:'מקצוע אחר', math:'מתמטיקה', eng:'אנגלית', sci:'מדעים (פיזיקה/כימיה/ביולוגיה)', hum:'הומניסטיקה (היסטוריה/ספרות/תנ״ך)', rel:'מקצועות קודש (תלמוד/תושב״ע/מחשבת)'},
+  en: {other:'Other subject', math:'Math', eng:'English', sci:'Sciences (physics/chemistry/biology)', hum:'Humanities (history/literature/Bible)', rel:'Religious studies (Talmud/Jewish thought)'},
+  ru: {other:'Другой предмет', math:'Математика', eng:'Английский', sci:'Науки (физика/химия/биология)', hum:'Гуманитарные (история/литература/Библия)', rel:'Религиозные предметы (Талмуд/еврейская мысль)'},
+  fr: {other:'Autre matière', math:'Maths', eng:'Anglais', sci:'Sciences (physique/chimie/biologie)', hum:'Humanités (histoire/littérature/Bible)', rel:'Études religieuses (Talmud/pensée juive)'},
+  ar: {other:'موضوع آخر', math:'الرياضيات', eng:'الإنجليزية', sci:'العلوم (فيزياء/كيمياء/أحياء)', hum:'الإنسانيات (تاريخ/أدب/توراة)', rel:'مواضيع دينية (تلمود/فكر يهودي)'}
+};
 const BAGP = {
-  tau: {exact: true, label: 'לפי הידיעון הרשמי של אוניברסיטת תל אביב', minG: 60, b: {'5': {math: 20, eng: 25, sci: 25, hum: 25, rel: 25, other: 20}, '4': {math: 12.5, eng: 12.5, sci: 10, hum: 10, rel: 10, other: 10}}},
-  technion: {exact: true, label: 'לפי ידיעון הטכניון (לא כולל ארכיטקטורה ואדריכלות נוף)', mathDouble: true, cap: 119, note: 'יחידות המתמטיקה נספרות במשקל כפול. בונוס קומבו מדעי-טכנולוגי מיוחד אינו מחושב כאן.', b: {'5': {math: 30, eng: 25, sci: 25, hum: 25, rel: 25, other: 25}, '4': {math: 10, eng: 10, sci: 10, hum: 10, rel: 10, other: 10}}},
-  bgu: {exact: true, label: 'לפי ידיעון אוניברסיטת בן-גוריון בנגב', minG: 61, cap: 120, b: {'5': {math: 35, eng: 25, sci: 25, hum: 20, rel: 20, other: 20}, '4': {math: 20, eng: 15, sci: 10, hum: 10, rel: 10, other: 10}}},
-  biu: {exact: true, label: 'לפי ידיעון אוניברסיטת בר-אילן', b: {'5': {math: 35, eng: 25, sci: 20, hum: 20, rel: 25, other: 20}, '4': {math: 12.5, eng: 12.5, sci: 10, hum: 10, rel: 12.5, other: 10}}},
-  haifa: {exact: true, label: 'לפי ידיעון אוניברסיטת חיפה', b: {'5': {math: 35, eng: 25, sci: 25, hum: 25, rel: 25, other: 20}, '4': {math: 20, eng: 20, sci: 20, hum: 20, rel: 20, other: 10}}},
-  yvc: {exact: true, label: 'המכללה האקדמית עמק יזרעאל - ממוצע גולמי ללא בונוסים כלל, לפי האתר הרשמי', b: {'5': {math: 0, eng: 0, sci: 0, hum: 0, rel: 0, other: 0}, '4': {math: 0, eng: 0, sci: 0, hum: 0, rel: 0, other: 0}}}
+  tau: {exact: true, lk: 'bagLblTau', minG: 60, b: {'5': {math: 20, eng: 25, sci: 25, hum: 25, rel: 25, other: 20}, '4': {math: 12.5, eng: 12.5, sci: 10, hum: 10, rel: 10, other: 10}}},
+  technion: {exact: true, lk: 'bagLblTechnion', mathDouble: true, cap: 119, nk: 'techNote', b: {'5': {math: 30, eng: 25, sci: 25, hum: 25, rel: 25, other: 25}, '4': {math: 10, eng: 10, sci: 10, hum: 10, rel: 10, other: 10}}},
+  bgu: {exact: true, lk: 'bagLblBgu', minG: 61, cap: 120, b: {'5': {math: 35, eng: 25, sci: 25, hum: 20, rel: 20, other: 20}, '4': {math: 20, eng: 15, sci: 10, hum: 10, rel: 10, other: 10}}},
+  biu: {exact: true, lk: 'bagLblBiu', b: {'5': {math: 35, eng: 25, sci: 20, hum: 20, rel: 25, other: 20}, '4': {math: 12.5, eng: 12.5, sci: 10, hum: 10, rel: 12.5, other: 10}}},
+  haifa: {exact: true, lk: 'bagLblHaifa', b: {'5': {math: 35, eng: 25, sci: 25, hum: 25, rel: 25, other: 20}, '4': {math: 20, eng: 20, sci: 20, hum: 20, rel: 20, other: 10}}},
+  yvc: {exact: true, lk: 'bagLblYvc', b: {'5': {math: 0, eng: 0, sci: 0, hum: 0, rel: 0, other: 0}, '4': {math: 0, eng: 0, sci: 0, hum: 0, rel: 0, other: 0}}}
 };
 function bagProfile(inst){
-  if(inst.id === 'open') return {none: true, det: 'האוניברסיטה הפתוחה אינה משתמשת בממוצע בגרות כלל - הקבלה פתוחה לכולם, בלי תנאי סף.'};
+  if(inst.id === 'open') return {none: true, dk: 'openDet'};
   const p = BAGP[inst.id];
   if(p) return p;
-  return {exact: false, label: 'הערכה לפי השיטה הסטנדרטית (25 נקודות ב-5 יח״ל, 12.5 ב-4 יח״ל)', b: {'5': {math: 25, eng: 25, sci: 25, hum: 25, rel: 25, other: 25}, '4': {math: 12.5, eng: 12.5, sci: 12.5, hum: 12.5, rel: 12.5, other: 12.5}}};
+  return {exact: false, lk: 'stdLabel', b: {'5': {math: 25, eng: 25, sci: 25, hum: 25, rel: 25, other: 25}, '4': {math: 12.5, eng: 12.5, sci: 12.5, hum: 12.5, rel: 12.5, other: 12.5}}};
 }
 function bonusOf(p, units, cat, grade){
   if(units < 4) return 0;
@@ -905,18 +1106,19 @@ function bonusOf(p, units, cat, grade){
 function addBagRow(cat, mand){
   const box = $('bagRows'); if(!box) return;
   const div = document.createElement('div'); div.className = 'brow';
+  const cn = CATS[LANG] || CATS.he;
   div.innerHTML = `<select class="bcat">
-      <option value="other">מקצוע אחר</option>
-      <option value="math">מתמטיקה</option>
-      <option value="eng">אנגלית</option>
-      <option value="sci">מדעים (פיזיקה/כימיה/ביולוגיה)</option>
-      <option value="hum">הומניסטיקה (היסטוריה/ספרות/תנ״ך)</option>
-      <option value="rel">מקצועות קודש (תלמוד/תושב״ע/מחשבת)</option>
+      <option value="other">${cn.other}</option>
+      <option value="math">${cn.math}</option>
+      <option value="eng">${cn.eng}</option>
+      <option value="sci">${cn.sci}</option>
+      <option value="hum">${cn.hum}</option>
+      <option value="rel">${cn.rel}</option>
     </select>
-    <select class="bunits"><option value="1">1 יח״ל</option><option value="2">2 יח״ל</option><option value="3">3 יח״ל</option><option value="4">4 יח״ל</option><option value="5" selected>5 יח״ל</option></select>
-    <input class="bgrade" type="number" min="0" max="100" placeholder="ציון">
-    <label class="bmand"><input type="checkbox" ${mand ? 'checked' : ''}> חובה</label>
-    <button class="bdel" title="הסרת מקצוע">✕</button>`;
+    <select class="bunits">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===5?' selected':''}>${n} ${t('unitsWord')}</option>`).join('')}</select>
+    <input class="bgrade" type="number" min="0" max="100" placeholder="${t('gradePh')}">
+    <label class="bmand"><input type="checkbox" ${mand ? 'checked' : ''}> ${t('mand')}</label>
+    <button class="bdel" title="${t('removeTitle')}">✕</button>`;
   div.querySelector('.bcat').value = cat || 'other';
   div.querySelector('.bdel').addEventListener('click', ()=>div.remove());
   box.appendChild(div);
@@ -925,12 +1127,12 @@ function runBag(){
   const inst = DATA.institutions.find(x=>x.id === $('bagInst').value); if(!inst) return;
   const p = bagProfile(inst);
   const out = $('bagOut');
-  if(p.none){ out.innerHTML = `<div class="calcres"><div class="det">${p.det}</div></div>`; return; }
+  if(p.none){ out.innerHTML = `<div class="calcres"><div class="det">${t(p.dk)}</div></div>`; return; }
   const rows = [...document.querySelectorAll('#bagRows .brow')].map(r=>{
     const grade = parseFloat(r.querySelector('.bgrade').value);
     return {cat: r.querySelector('.bcat').value, units: parseInt(r.querySelector('.bunits').value), grade: isNaN(grade) ? null : grade, mand: r.querySelector('.bmand input').checked};
   }).filter(r=>r.grade != null && r.units > 0);
-  if(rows.length < 3){ out.innerHTML = `<div class="calcres"><div class="det">הזן לפחות 3 מקצועות עם ציונים</div></div>`; return; }
+  if(rows.length < 3){ out.innerHTML = `<div class="calcres"><div class="det">${t('bagMinSubjects')}</div></div>`; return; }
   const eff = r => r.grade + bonusOf(p, r.units, r.cat, r.grade);
   const wOf = r => (p.mathDouble && r.cat === 'math') ? r.units * 2 : r.units;
   const avgOf = list => { let s = 0, w = 0; list.forEach(r=>{ s += eff(r) * wOf(r); w += wOf(r); }); return w ? s / w : 0; };
@@ -953,18 +1155,18 @@ function runBag(){
   let avg = avgOf(chosen);
   if(p.cap) avg = Math.min(avg, p.cap);
   avg = Math.round(avg * 10) / 10;
-  const catName = {math: 'מתמטיקה', eng: 'אנגלית', sci: 'מדעים', hum: 'הומניסטיקה', rel: 'מקצועות קודש', other: 'אחר'};
-  out.innerHTML = `<div class="calcres"><div style="font-size:14px;color:var(--mut)">${inst.name} - ממוצע הבגרות המשוקלל שלך</div><div class="big">${avg}</div>
-  <div class="det">${p.label}${p.exact ? '' : ' • הערכה'}${p.note ? '<br>' + p.note : ''}<br>נכללו ${chosen.length} מקצועות, ${totalU()} יחידות לימוד${dropped.length ? '<br>הושמטו בחישוב האופטימלי: ' + dropped.map(r=>catName[r.cat]).join(', ') : ''}</div>
-  <button class="pbtn save" id="useBagAvg" style="margin-top:12px">השתמש בממוצע הזה בציונים שלי</button></div>`;
+  const catName = CATS[LANG] || CATS.he;
+  out.innerHTML = `<div class="calcres"><div style="font-size:14px;color:var(--mut)">${tf('weightedOf', {name: inst.name})}</div><div class="big">${avg}</div>
+  <div class="det">${t(p.lk)}${p.exact ? '' : ' • ' + t('estimateWord')}${p.nk ? '<br>' + t(p.nk) : ''}<br>${tf('includedLine', {n: chosen.length, u: totalU()})}${dropped.length ? '<br>' + tf('droppedLine', {list: dropped.map(r=>catName[r.cat]).join(', ')}) : ''}</div>
+  <button class="pbtn save" id="useBagAvg" style="margin-top:12px">${t('useAvg')}</button></div>`;
   $('useBagAvg').addEventListener('click', ()=>{
     if(!MY) MY = {psy: null, bag: null, mu: null, mg: null, eu: null, eg: null};
     MY.bag = avg;
     try{ localStorage.setItem('adm_my', JSON.stringify(MY)); }catch(e){}
     $('inBag').value = avg;
-    const b = $('myBtn'); if(b){ b.classList.add('on'); b.textContent = '🎯 הציונים שלי ✓'; }
+    const b = $('myBtn'); if(b){ b.classList.add('on'); b.textContent = t('myScoresOn'); }
     pushMyScores(); refreshView();
-    $('useBagAvg').textContent = '✓ נשמר בציונים שלי';
+    $('useBagAvg').textContent = t('savedToScores');
   });
 }
 function runCalc(){
@@ -972,16 +1174,16 @@ function runCalc(){
   const psy = parseFloat($('calcPsy').value), bag = parseFloat($('calcBag').value);
   const res = calcSehem(i, isNaN(psy) ? null : psy, isNaN(bag) ? null : bag);
   const out = $('calcOut');
-  if(res.err){ out.innerHTML = `<div class="calcres"><div class="det">${res.err}</div></div>`; return; }
-  if(res.none){ out.innerHTML = `<div class="calcres"><div class="det">${res.det}</div></div>`; return; }
-  out.innerHTML = `<div class="calcres"><div style="font-size:14px;color:var(--mut)">${i.name} - הסכם שלך</div><div class="big">${res.score}</div><div class="det">${res.scale} • ${res.exact ? 'לפי הנוסחה הרשמית' : 'הערכה'}<br>${res.det}</div></div>`;
+  if(res.errK){ out.innerHTML = `<div class="calcres"><div class="det">${t(res.errK)}</div></div>`; return; }
+  if(res.none){ out.innerHTML = `<div class="calcres"><div class="det">${res.draw || t(res.dk)}</div></div>`; return; }
+  out.innerHTML = `<div class="calcres"><div style="font-size:14px;color:var(--mut)">${tf('yourSehem', {name: i.name})}</div><div class="big">${res.score}</div><div class="det">${t(res.sk)} • ${res.exact ? t('officialFormula') : t('estimateWord')}<br>${t(res.dk)}</div></div>`;
 }
 function buildCmp(){
   const v = $('cmpView');
-  v.innerHTML = `<button class="back" onclick="goHome()">→ חזרה לכל המוסדות</button>
-  <div class="sec-t">⚖️ השוואת מוסדות לפי תואר</div>
+  v.innerHTML = `<button class="back" onclick="goHome()">${t('backAll')}</button>
+  <div class="sec-t">${t('cmpTitle')}</div>
   <div class="fcard">
-    <div class="fld" style="width:100%"><label>שם התואר</label><input id="cmpQ" type="search" placeholder="למשל: מדעי המחשב" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px"></div>
+    <div class="fld" style="width:100%"><label>${t('cmpDegreeName')}</label><input id="cmpQ" type="search" placeholder="${t('cmpPh')}" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px"></div>
     <div id="cmpNames" style="margin-top:12px"></div>
     <div id="cmpOut" style="margin-top:14px"></div>
   </div>`;
@@ -991,7 +1193,7 @@ function buildCmp(){
     if(q.length < 2){ box.innerHTML = ''; return; }
     const names = new Set();
     DATA.institutions.forEach(i=>(i.degrees || []).forEach(d=>{ if(d.name.toLowerCase().includes(q)) names.add(d.name); }));
-    box.innerHTML = [...names].slice(0, 20).map(n=>`<div class="res-item" data-cn="${escA(n)}">${n}</div>`).join('') || '<div class="empty">לא נמצא תואר מתאים</div>';
+    box.innerHTML = [...names].slice(0, 20).map(n=>`<div class="res-item" data-cn="${escA(n)}">${n}</div>`).join('') || '<div class="empty">' + t('cmpNotFound') + '</div>';
     box.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click', ()=>{ $('cmpQ').value = el.dataset.cn; renderCmp(el.dataset.cn); }));
   });
 }
@@ -1002,9 +1204,9 @@ function renderCmp(name){
     if(d) rows.push({i, d});
   });
   rows.sort((a,b)=>(b.d.psychometric ?? -1) - (a.d.psychometric ?? -1));
-  $('cmpOut').innerHTML = `<h3 style="font-size:17px;font-weight:900;margin-bottom:10px">${name} - ${rows.length} מוסדות</h3>
-  <div style="overflow-x:auto"><table class="ct"><tr><th>מוסד</th><th>פסיכומטרי</th><th>ממוצע בגרות</th><th>סכם / התאמה</th><th>שכר לימוד לשנה</th></tr>
-  ${rows.map(r=>`<tr><td><a href="#" data-ci="${r.i.id}" style="color:var(--teal);text-decoration:none;font-weight:700">${r.i.name}</a></td><td>${fmt(r.d.psychometric) ?? 'לא פורסם'}</td><td>${fmt(r.d.bagrut) ?? 'לא פורסם'}</td><td>${fmt(r.d.sechem_min) ?? 'לא פורסם'}</td><td>${tuitText(r.i)}</td></tr>`).join('')}
+  $('cmpOut').innerHTML = `<h3 style="font-size:17px;font-weight:900;margin-bottom:10px">${tf('cmpInstCount', {name: name, n: rows.length})}</h3>
+  <div style="overflow-x:auto"><table class="ct"><tr><th>${t('thInst')}</th><th>${t('thPsy')}</th><th>${t('thBag')}</th><th>${t('thSec')}</th><th>${t('thTuit')}</th></tr>
+  ${rows.map(r=>`<tr><td><a href="#" data-ci="${r.i.id}" style="color:var(--teal);text-decoration:none;font-weight:700">${r.i.name}</a></td><td>${fmt(r.d.psychometric) ?? t('notPublished')}</td><td>${fmt(r.d.bagrut) ?? t('notPublished')}</td><td>${fmt(r.d.sechem_min) ?? t('notPublished')}</td><td>${tuitText(r.i)}</td></tr>`).join('')}
   </table></div>`;
   $('cmpOut').querySelectorAll('[data-ci]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); window._noTopScroll = true; showInst(a.dataset.ci); window._noTopScroll = false; jumpToDegree(name); }));
 }
@@ -1014,8 +1216,8 @@ function buildFav(){
   DATA.institutions.forEach(i=>(i.degrees || []).forEach(d=>{ if(FAVS.has(favKey(i.id, d.name))){ (byInst[i.id] = byInst[i.id] || {i, ds: []}).ds.push(d); } }));
   const groups = Object.values(byInst);
   const total = groups.reduce((n,g)=>n + g.ds.length, 0);
-  let h = `<button class="back" onclick="goHome()">→ חזרה לכל המוסדות</button><div class="sec-t">⭐ המועדפים שלי (${total})</div>`;
-  if(!total) h += '<div class="empty">עדיין אין מועדפים. בעמוד של מוסד, לחץ על הכוכב ליד תואר כדי להוסיף אותו לכאן.</div>';
+  let h = `<button class="back" onclick="goHome()">${t('backAll')}</button><div class="sec-t">${tf('favTitle', {n: total})}</div>`;
+  if(!total) h += '<div class="empty">' + t('favEmpty') + '</div>';
   else groups.forEach(g=>{ h += `<div class="res-group"><h3>${g.i.name}</h3><div class="deg">${g.ds.map(d=>dcard(d, g.i.id)).join('')}</div></div>`; });
   v.innerHTML = h;
   bindStars(v);
@@ -1027,6 +1229,54 @@ function countView(){
     sessionStorage.setItem('adm_pv', '1');
     SB.from('pageviews').insert({}).then(()=>{}, ()=>{});
   }catch(e){}
+}
+function updText(){
+  const up = (DATA.updated || '').split('-');
+  const upF = up.length === 3 ? up[2] + '/' + up[1] + '/' + up[0] : (DATA.updated || '');
+  const el = $('upd'); if(el) el.textContent = tf('updFmt', {d: upF, n: DATA.institutions.length});
+}
+function updAuthBtn(){
+  const b = $('authBtn'); if(!b) return;
+  b.textContent = USER ? t('logout') + ' (' + (USER.email || t('connected')) + ')' : t('login');
+}
+function buildLangMenu(){
+  const m = $('langMenu'); if(!m) return;
+  m.innerHTML = Object.keys(LANG_NAMES).filter(c => c !== LANG).map(c => `<button data-lang="${c}">${LANG_NAMES[c]}</button>`).join('');
+  m.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { m.style.display = 'none'; setLang(b.dataset.lang); }));
+}
+function setLang(c){
+  LANG = c;
+  try{ localStorage.setItem('adm_lang', c); }catch(e){}
+  AREA_NAMES = AREA_ALL[LANG] || AREA_ALL.he;
+  QUIZ_Q = QUIZ_ALL[LANG] || QUIZ_ALL.he;
+  applyLang();
+}
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = (LANG === 'he' || LANG === 'ar') ? 'rtl' : 'ltr';
+  document.title = t('titleTag');
+  const tg = $('tagline'); if(tg) tg.textContent = t('tagline');
+  $('themeBtn').title = t('themeTitle');
+  $('langBtn').title = t('langTitle');
+  document.querySelectorAll('[data-k]').forEach(el => { el.textContent = t(el.dataset.k); });
+  document.querySelectorAll('[data-kph]').forEach(el => { el.placeholder = t(el.dataset.kph); });
+  buildSelect();
+  updText();
+  updAuthBtn();
+  const mb = $('myBtn');
+  if(mb){ mb.classList.toggle('on', !!MY); mb.textContent = MY ? t('myScoresOn') : t('myScores'); }
+  buildLangMenu();
+  if(curFeat){
+    const keep = curFeat;
+    hideFeatViews();
+    curFeat = keep;
+    document.querySelectorAll('.fbtn').forEach(b => b.classList.toggle('active', b.dataset.v === keep));
+    if(keep === 'calc') buildCalc();
+    if(keep === 'cmp') buildCmp();
+    if(keep === 'fav') buildFav();
+    if(keep === 'quiz') buildQuiz();
+    const el = $(keep + 'View'); if(el) el.style.display = 'block';
+  } else refreshView();
 }
 function syncTheme(){
   const b = $('themeBtn'); if(!b) return;
