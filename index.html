@@ -290,10 +290,9 @@ function matchOf(d, instId){
   if(subjBlock(d).length) return 'no';
   if(d.sechem_min != null){
     const inst = DATA.institutions.find(x=>x.id === instId);
-    if(!inst || MY.psy == null || MY.bag == null) return 'unk';
-    const r = calcSehem(inst, MY.psy, MY.bag);
-    if(!r || r.score == null) return 'unk';
-    return r.score >= d.sechem_min ? 'ok' : 'no';
+    const r = (inst && MY.psy != null && MY.bag != null) ? calcSehem(inst, MY.psy, MY.bag) : null;
+    if(r && r.score != null) return r.score >= d.sechem_min ? 'ok' : 'no';
+    if(d.psychometric == null && d.bagrut == null) return 'unk';
   }
   const p = d.psychometric, b = d.bagrut;
   let unknown = (p == null && b == null);
