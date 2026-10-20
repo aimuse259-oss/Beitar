@@ -184,7 +184,9 @@ async function init(){
     const r = await fetch('data.json',{cache:'no-store'});
     DATA = await r.json();
   }catch(e){ $('browse').innerHTML = '<div class="empty">שגיאה בטעינת הנתונים</div>'; return; }
-  $('upd').textContent = 'עודכן: ' + (DATA.updated || '') + ' • ' + DATA.institutions.length + ' מוסדות';
+  const up = (DATA.updated||'').split('-');
+  const upF = up.length===3 ? up[2]+'/'+up[1]+'/'+up[0] : (DATA.updated||'');
+  $('upd').textContent = 'עודכן: ' + upF + ' • ' + DATA.institutions.length + ' מוסדות';
   buildSelect(); renderBrowse();
   $('q').addEventListener('input', onSearch);
   $('instSel').addEventListener('change', e=>{ if(e.target.value) showInst(e.target.value); });
