@@ -118,7 +118,7 @@ footer b{color:var(--mut)}
 <header>
   <div class="wrap">
     <h1>דרישות סף <span class="ac">לאקדמיה</span></h1>
-    <p>תנאי קבלה מעודכנים לתואר ראשון — בכל אוניברסיטה ומכללה בישראל</p>
+    <p>תנאי קבלה מעודכנים לתואר ראשון - בכל אוניברסיטה ומכללה בישראל</p>
     <span class="upd" id="upd">טוען נתונים…</span>
   </div>
 </header>
@@ -127,10 +127,10 @@ footer b{color:var(--mut)}
   <div class="wrap">
     <div class="search">
       <span class="ic">🔍</span>
-      <input id="q" type="search" placeholder="חיפוש מדויק — שם תואר או מוסד…" autocomplete="off">
+      <input id="q" type="search" placeholder="חיפוש מדויק - שם תואר או מוסד…" autocomplete="off">
     </div>
     <div class="pick">
-      <select id="instSel"><option value="">בחירה מרשימה — כל המוסדות…</option></select>
+      <select id="instSel"><option value="">בחירה מרשימה - כל המוסדות…</option></select>
     </div>
     <button id="myBtn" class="mybtn">🎯 הציונים שלי</button>
   </div>
@@ -154,7 +154,7 @@ footer b{color:var(--mut)}
 <footer>
   <div class="wrap">
     <b>שימו לב:</b> האתר מציג תואר ראשון בלבד. הנתונים נאספו מהאתרים הרשמיים של המוסדות ומעודכנים לשנת הנתונים המצוינת ליד כל מוסד.
-    חתכי הקבלה משתנים משנה לשנה ותלויים בביקוש — יש לוודא תמיד מול המוסד עצמו לפני הגשת מועמדות.
+    חתכי הקבלה משתנים משנה לשנה ותלויים בביקוש - יש לוודא תמיד מול המוסד עצמו לפני הגשת מועמדות.
   </div>
 </footer>
 
@@ -317,7 +317,7 @@ function onSearch(e){
     if(im || dm.length){
       h += `<div class="res-group"><h3>${i.name}</h3>`;
       if(im && !dm.length) h += `<div class="res-item" data-id="${i.id}">פתיחת דף המוסד<small>${(i.degrees||[]).length} תארים</small></div>`;
-      dm.forEach(d=>{ h += `<div class="res-item" data-id="${i.id}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'—'} • בגרות: ${fmt(d.bagrut)??'—'}</small></div>`; });
+      dm.forEach(d=>{ h += `<div class="res-item" data-id="${i.id}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'-'} • בגרות: ${fmt(d.bagrut)??'-'}</small></div>`; });
       h += '</div>';
     }
   });
