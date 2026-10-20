@@ -206,7 +206,7 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
 </div>
 <div class="featbar locked" id="featBar">
   <div class="wrap">
-    <button class="fbtn" data-v="calc">🧮 מחשבון סכם</button>
+    <button class="fbtn" data-v="calc">🧮 מחשבון סכם ובגרות</button>
     <button class="fbtn" data-v="cmp">⚖️ השוואת מוסדות</button>
     <button class="fbtn" data-v="fav">⭐ מועדפים</button>
     <span class="feathint">למשתמשים רשומים בלבד • ההרשמה חינמית</span>
@@ -239,7 +239,7 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
   <div class="modal">
     <button class="mclose" id="authClose">✕</button>
     <h3>כניסה לאתר</h3>
-    <p id="authMsg">התכונות המתקדמות - מחשבון סכם, השוואת מוסדות, מועדפים ושכר לימוד - זמינות למשתמשים רשומים. ההרשמה חינמית ולוקחת חצי דקה.</p>
+    <p id="authMsg">התכונות המתקדמות - מחשבון סכם ובגרות, השוואת מוסדות, מועדפים ושכר לימוד - זמינות למשתמשים רשומים. ההרשמה חינמית ולוקחת חצי דקה.</p>
     <div id="stepMain">
       <button class="gbtn" id="gLogin"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>כניסה עם Google</button>
       <div class="sep">או</div>
@@ -284,19 +284,27 @@ function subjBlock(d){
   }
   return out;
 }
-function matchOf(d){
+function matchOf(d, instId){
   if(!MY) return null;
-  const p = d.psychometric, b = d.bagrut;
-  if(p==null && b==null) return subjBlock(d).length ? 'no' : 'unk';
-  if(p!=null && (MY.psy==null || MY.psy < p)) return 'no';
-  if(b!=null && (MY.bag==null || MY.bag < b)) return 'no';
   if(subjBlock(d).length) return 'no';
-  return 'ok';
+  if(d.sechem_min != null){
+    const inst = DATA.institutions.find(x=>x.id === instId);
+    if(!inst || MY.psy == null || MY.bag == null) return 'unk';
+    const r = calcSehem(inst, MY.psy, MY.bag);
+    if(!r || r.score == null) return 'unk';
+    return r.score >= d.sechem_min ? 'ok' : 'no';
+  }
+  const p = d.psychometric, b = d.bagrut;
+  let unknown = (p == null && b == null);
+  if(p != null){ if(MY.psy == null) unknown = true; else if(MY.psy < p) return 'no'; }
+  if(b != null){ if(MY.bag == null) unknown = true; else if(MY.bag < b) return 'no'; }
+  return unknown ? 'unk' : 'ok';
 }
 const MBADGE = {ok:'<span class="mbadge m-ok">✅ עומד בדרישות</span>',
   no:'<span class="mbadge m-no">❌ לא עומד בדרישות</span>',
   unk:'<span class="mbadge m-unk">❓ לא ידוע</span>'};
 let SB = null, USER = null, FAVS = new Set(), curFeat = null;
+let WAS_AUTH = false;
 try{ SB = window.supabase.createClient('https://jmkfqwctuxbdqkhzmwpt.supabase.co', 'sb_publishable_uEle4D1AOWfEwR3bsgoEHA_BgR0-d_y'); }catch(e){ SB = null; }
 const escA = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 function favKey(instId, dname){ return instId + '::' + dname; }
@@ -310,7 +318,7 @@ function tuitHtml(i){
   if(i.tuition_note) return `<div class="tuit">💰 שכר לימוד: ${i.tuition_note}</div>`;
   return '';
 }
-function matchCount(i){ return (i.degrees||[]).filter(d=>matchOf(d)==='ok').length; }
+function matchCount(i){ const c = {ok: 0, no: 0, unk: 0}; (i.degrees||[]).forEach(d=>{ const m = matchOf(d, i.id); if(m) c[m]++; }); return c; }
 
 async function init(){
   try{
@@ -385,7 +393,8 @@ function odaysSmall(i){
   return `<div class="odays">🗓️ ${txt}</div>`;
 }
 function card(i){
-  const mc = MY ? `<div class="match-n">🎯 ${matchCount(i)} תארים מתאימים לך</div>` : '';
+  const c = MY ? matchCount(i) : null;
+  const mc = c ? `<div class="match-n">🎯 מתאימים לך: ${c.ok} ✅ • ${c.no} ❌ • ${c.unk} ❓</div>` : '';
   return `<div class="inst-card" data-id="${i.id}">
     <h3>${i.name}</h3>
     <div class="meta"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${i.type}</span><span class="city">${i.city||''}</span></div>
@@ -403,6 +412,7 @@ function showInst(id){
   const degs = i.degrees||[];
   const psy = degs.map(d=>d.psychometric).filter(n=>n!=null);
   const bag = degs.map(d=>d.bagrut).filter(n=>n!=null);
+  const sec = degs.map(d=>d.sechem_min).filter(n=>n!=null);
   const rng = (a,lbl,unit) => a.length ?
     `<div class="rbox"><div class="l">${lbl}</div><div class="v">${Math.min(...a)}–${Math.max(...a)} <small>${unit}</small></div></div>` :
     `<div class="rbox"><div class="l">${lbl}</div><div class="v" style="font-size:14px;color:var(--dim)">לא פורסם</div></div>`;
@@ -411,10 +421,11 @@ function showInst(id){
     <button class="back" onclick="goHome()">→ חזרה לכל המוסדות</button>
     <div class="sum">
       <h2>${i.name}</h2>
-      <div class="row"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${i.type}</span><span class="city">${i.city||''}</span>${mc!=null?`<span class="match-n" style="margin:0">🎯 ${mc} מתאימים לך</span>`:''}</div>
+      <div class="row"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${i.type}</span><span class="city">${i.city||''}</span>${mc!=null?`<span class="match-n" style="margin:0">🎯 ${mc.ok} ✅ • ${mc.no} ❌ • ${mc.unk} ❓</span>`:''}</div>
       <div class="range">
         ${rng(psy,'טווח פסיכומטרי (מינימום–מקסימום)','')}
         ${rng(bag,'טווח ממוצע בגרות (מינימום–מקסימום)','')}
+        ${sec.length?rng(sec,'טווח סכם / התאמה (מינימום–מקסימום)',''):''}
         <div class="rbox"><div class="l">מספר תארים</div><div class="v">${degs.length}</div></div>
       </div>
       <div class="src">נתוני ${i.data_year||''} • מקור: ${i.source?`<a href="${i.source}" target="_blank" rel="noopener">האתר הרשמי</a>`:'האתר הרשמי'}</div>
@@ -429,12 +440,12 @@ function showInst(id){
   if(!window._noTopScroll) window.scrollTo({top:0,behavior:'smooth'});
 }
 function degListHtml(degs, instId){
-  const list = onlyMine && MY ? degs.filter(d=>matchOf(d)==='ok') : degs;
+  const list = onlyMine && MY ? degs.filter(d=>matchOf(d, instId)==='ok') : degs;
   return list.map(d=>dcard(d, instId)).join('') || '<div class="empty">אין תארים מתאימים עם הנתונים שהזנת</div>';
 }
 function dcard(d, instId){
-  const pv = fmt(d.psychometric), bv = fmt(d.bagrut);
-  const m = matchOf(d);
+  const pv = fmt(d.psychometric), bv = fmt(d.bagrut), sv = fmt(d.sechem_min);
+  const m = matchOf(d, instId);
   const blk = subjBlock(d);
   const star = USER ? `<button class="star ${FAVS.has(favKey(instId, d.name))?'on':''}" data-fi="${instId}" data-fd="${escA(d.name)}" title="הוספה למועדפים">★</button>` : '';
   return `<div class="dcard" data-dname="${escA(d.name)}">
@@ -442,6 +453,7 @@ function dcard(d, instId){
     <div class="vals">
       <div class="val ${pv==null?'na':''}"><div class="l">פסיכומטרי</div><div class="n">${pv==null?'לא פורסם':pv}</div></div>
       <div class="val ${bv==null?'na':''}"><div class="l">ממוצע בגרות</div><div class="n">${bv==null?'לא פורסם':bv}</div></div>
+      ${sv!=null?`<div class="val"><div class="l">סכם / התאמה נדרש</div><div class="n">${sv}</div></div>`:''}
     </div>
     ${blk.length?`<div class="blockline">🚫 חסום עבורך: ${blk.join(' • ')}</div>`:''}
     ${d.notes?`<div class="notes">${d.notes}</div>`:''}
@@ -508,6 +520,7 @@ function setUser(u){
   USER = u;
   const b = $('authBtn'); if(!b) return;
   if(u){
+    WAS_AUTH = true;
     b.textContent = 'יציאה (' + (u.email || 'מחובר') + ')';
     $('featBar').classList.remove('locked');
     loadFavs().then(()=>{ if($('instView').style.display !== 'none') refreshView(); });
@@ -516,13 +529,16 @@ function setUser(u){
     b.textContent = '🔐 כניסה';
     $('featBar').classList.add('locked');
     FAVS = new Set();
-    MY = null; onlyMine = false;
-    try{ localStorage.removeItem('adm_my'); }catch(e){}
-    const mb = $('myBtn');
-    if(mb){ mb.classList.remove('on'); mb.textContent = '🎯 הציונים שלי'; }
-    const ip = $('inPsy'), ib = $('inBag');
-    if(ip) ip.value = ''; if(ib) ib.value = '';
-    ['inMu','inMg','inEu','inEg'].forEach(id=>{ const el = $(id); if(el) el.value = ''; });
+    if(WAS_AUTH){
+      WAS_AUTH = false;
+      MY = null; onlyMine = false;
+      try{ localStorage.removeItem('adm_my'); }catch(e){}
+      const mb = $('myBtn');
+      if(mb){ mb.classList.remove('on'); mb.textContent = '🎯 הציונים שלי'; }
+      const ip = $('inPsy'), ib = $('inBag');
+      if(ip) ip.value = ''; if(ib) ib.value = '';
+      ['inMu','inMg','inEu','inEg'].forEach(id=>{ const el = $(id); if(el) el.value = ''; });
+    }
     const wasFeat = curFeat !== null;
     hideFeatViews();
     if(wasFeat) goHome();
@@ -614,7 +630,7 @@ function calcSehem(i, psy, bag){
   switch(i.id){
     case 'huji':
       if(bag == null) return needBag;
-      return {score: r2(((psy * 0.032073 + 0.3672) + (bag * 3.963 - 20.0621)) / 2), scale: 'סולם 10-30 בקירוב', exact: true, det: 'סכם = ממוצע של ציון תקן פסיכומטרי וציון תקן בגרות. בחלק מהפקולטות השקלול הוא 70% פסיכומטרי ו-30% בגרות.'};
+      return {score: r2((0.3 * ((bag / 10) * 3.963 - 20.0621) + 0.7 * (psy * 0.032073 + 0.3672)) * 1.2235 - 4.4598), scale: 'ציון משוקלל, סולם 10-30 בקירוב', exact: true, det: 'לפי הנוסחה הרשמית של האוניברסיטה העברית: תקנון בגרות (הממוצע בסולם 11.52) ותקנון פסיכומטרי, בשקלול 30% בגרות ו-70% פסיכומטרי. בחוגים עם "ריבוי משוקללים" נלקח הגבוה מבין שקלול זה לשקלול 50/50.'};
     case 'tau':
       if(bag == null) return needBag;
       return {score: r2(0.52 * ((bag * 9.62 - 349.9) + psy) - 43.10), scale: 'סולם פסיכומטרי, 200-800', exact: true, det: 'ציון התאמה לפי הנוסחה הרשמית של אוניברסיטת תל אביב. למדעים מדויקים והנדסה תיתכן תוספת בונוס על מתמטיקה ופיזיקה 5 יחידות.'};
@@ -810,8 +826,8 @@ function renderCmp(name){
   });
   rows.sort((a,b)=>(b.d.psychometric ?? -1) - (a.d.psychometric ?? -1));
   $('cmpOut').innerHTML = `<h3 style="font-size:17px;font-weight:900;margin-bottom:10px">${name} - ${rows.length} מוסדות</h3>
-  <div style="overflow-x:auto"><table class="ct"><tr><th>מוסד</th><th>פסיכומטרי</th><th>ממוצע בגרות</th><th>שכר לימוד לשנה</th></tr>
-  ${rows.map(r=>`<tr><td><a href="#" data-ci="${r.i.id}" style="color:var(--teal);text-decoration:none;font-weight:700">${r.i.name}</a></td><td>${fmt(r.d.psychometric) ?? 'לא פורסם'}</td><td>${fmt(r.d.bagrut) ?? 'לא פורסם'}</td><td>${tuitText(r.i)}</td></tr>`).join('')}
+  <div style="overflow-x:auto"><table class="ct"><tr><th>מוסד</th><th>פסיכומטרי</th><th>ממוצע בגרות</th><th>סכם / התאמה</th><th>שכר לימוד לשנה</th></tr>
+  ${rows.map(r=>`<tr><td><a href="#" data-ci="${r.i.id}" style="color:var(--teal);text-decoration:none;font-weight:700">${r.i.name}</a></td><td>${fmt(r.d.psychometric) ?? 'לא פורסם'}</td><td>${fmt(r.d.bagrut) ?? 'לא פורסם'}</td><td>${fmt(r.d.sechem_min) ?? 'לא פורסם'}</td><td>${tuitText(r.i)}</td></tr>`).join('')}
   </table></div>`;
   $('cmpOut').querySelectorAll('[data-ci]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); window._noTopScroll = true; showInst(a.dataset.ci); window._noTopScroll = false; jumpToDegree(name); }));
 }
