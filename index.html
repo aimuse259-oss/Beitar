@@ -476,10 +476,17 @@ function setUser(u){
     b.textContent = '🔐 כניסה';
     $('featBar').classList.remove('open');
     FAVS = new Set();
+    MY = null; onlyMine = false;
+    try{ localStorage.removeItem('adm_my'); }catch(e){}
+    const mb = $('myBtn');
+    if(mb){ mb.classList.remove('on'); mb.textContent = '🎯 הציונים שלי'; }
+    const ip = $('inPsy'), ib = $('inBag');
+    if(ip) ip.value = ''; if(ib) ib.value = '';
     const wasFeat = curFeat !== null;
     hideFeatViews();
     if(wasFeat) goHome();
-    else if($('instView').style.display !== 'none') refreshView();
+    if($('instView').style.display !== 'none') refreshView();
+    else if($('browse').style.display !== 'none') renderBrowse();
   }
 }
 function hideFeatViews(){
