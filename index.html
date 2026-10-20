@@ -266,7 +266,7 @@ function matchOf(d){
 const MBADGE = {ok:'<span class="mbadge m-ok">✅ עומד בדרישות</span>',
   no:'<span class="mbadge m-no">❌ לא עומד בדרישות</span>',
   unk:'<span class="mbadge m-unk">❓ לא ידוע</span>'};
-let SB = null, USER = null, FAVS = new Set();
+let SB = null, USER = null, FAVS = new Set(), curFeat = null;
 try{ SB = window.supabase.createClient('https://jmkfqwctuxbdqkhzmwpt.supabase.co', 'sb_publishable_uEle4D1AOWfEwR3bsgoEHA_BgR0-d_y'); }catch(e){ SB = null; }
 const escA = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 function favKey(instId, dname){ return instId + '::' + dname; }
@@ -304,10 +304,12 @@ async function init(){
     MY = {psy: isNaN(psy)?null:psy, bag: isNaN(bag)?null:bag};
     if(MY.psy==null && MY.bag==null){ MY = null; localStorage.removeItem('adm_my'); }
     else localStorage.setItem('adm_my', JSON.stringify(MY));
+    pushMyScores();
     syncBtn(); panel.classList.remove('open'); refreshView();
   });
   $('clearMy').addEventListener('click', ()=>{
     MY = null; onlyMine = false; localStorage.removeItem('adm_my');
+    pushMyScores();
     $('inPsy').value=''; $('inBag').value=''; syncBtn(); panel.classList.remove('open'); refreshView();
   });
   document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click', ()=>{ if(!USER){ openAuth(); return; } showFeatView(b.dataset.v); }));
@@ -476,6 +478,7 @@ function setUser(u){
     b.textContent = 'יציאה (' + (u.email || 'מחובר') + ')';
     $('featBar').classList.add('open');
     loadFavs().then(()=>{ if($('instView').style.display !== 'none') refreshView(); });
+    loadMyScores();
   } else {
     b.textContent = '🔐 כניסה';
     $('featBar').classList.remove('open');
@@ -484,13 +487,16 @@ function setUser(u){
   }
 }
 function hideFeatViews(){
+  curFeat = null;
   ['calcView','cmpView','favView'].forEach(id=>{ const el = $(id); if(el) el.style.display='none'; });
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
 }
 function showFeatView(v){
   if(!USER){ openAuth(); return; }
+  if(curFeat === v){ goHome(); return; }
   $('browse').style.display='none'; $('results').style.display='none'; $('instView').style.display='none';
   hideFeatViews();
+  curFeat = v;
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active', b.dataset.v === v));
   if(v === 'calc'){ buildCalc(); $('calcView').style.display='block'; }
   if(v === 'cmp'){ buildCmp(); $('cmpView').style.display='block'; }
@@ -517,6 +523,29 @@ async function toggleFav(instId, dname){
   }catch(e){}
   if($('favView').style.display !== 'none') buildFav();
   else if($('instView').style.display !== 'none') refreshView();
+}
+async function loadMyScores(){
+  if(!USER || !SB) return;
+  try{
+    const {data} = await SB.from('user_scores').select('psy, bag').eq('user_id', USER.id).maybeSingle();
+    if(data && (data.psy != null || data.bag != null)){
+      MY = {psy: data.psy != null ? Number(data.psy) : null, bag: data.bag != null ? Number(data.bag) : null};
+      try{ localStorage.setItem('adm_my', JSON.stringify(MY)); }catch(e){}
+      const b = $('myBtn');
+      if(b){ b.classList.toggle('on', true); b.textContent = '🎯 הציונים שלי ✓'; }
+      $('inPsy').value = MY.psy ?? ''; $('inBag').value = MY.bag ?? '';
+      refreshView();
+    } else if(MY){
+      await SB.from('user_scores').upsert({user_id: USER.id, psy: MY.psy, bag: MY.bag, updated_at: new Date().toISOString()});
+    }
+  }catch(e){}
+}
+async function pushMyScores(){
+  if(!USER || !SB) return;
+  try{
+    if(MY) await SB.from('user_scores').upsert({user_id: USER.id, psy: MY.psy, bag: MY.bag, updated_at: new Date().toISOString()});
+    else await SB.from('user_scores').delete().eq('user_id', USER.id);
+  }catch(e){}
 }
 function calcSehem(i, psy, bag){
   const r2 = n => Math.round(n * 100) / 100;
