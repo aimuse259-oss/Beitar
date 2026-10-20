@@ -227,12 +227,11 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
       <button class="gbtn" id="gLogin"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>כניסה עם Google</button>
       <div class="sep">או</div>
       <input id="authEmail" type="email" placeholder="כתובת מייל">
-      <button class="abtn" id="sendCode">שליחת קוד אימות למייל</button>
+      <button class="abtn" id="sendCode">שליחת קישור כניסה למייל</button>
     </div>
     <div id="stepCode" style="display:none">
-      <p>נשלח קוד בן 6 ספרות למייל. הזן אותו כאן:</p>
-      <input id="otpInput" class="otpcode" maxlength="6" inputmode="numeric" placeholder="______" dir="ltr">
-      <button class="abtn" id="verifyCode">אימות</button>
+      <p>📧 שלחנו קישור כניסה למייל שלך. פתח את המייל ולחץ על הקישור - תחזור לאתר מחובר.</p>
+      <button class="abtn" id="closeAfterSend">הבנתי, סגירה</button>
       <button class="pbtn clear" id="backToMain" style="width:100%;margin-top:8px">חזרה</button>
     </div>
   </div>
@@ -443,7 +442,7 @@ function onSearch(e){
   R.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click',()=>{ $('q').value=''; showInst(el.dataset.id); }));
 }
 function openAuth(){ if(!SB){ alert('שירות הכניסה אינו זמין כרגע'); return; } $('authModal').classList.add('open'); }
-function closeAuth(){ const m = $('authModal'); if(!m) return; m.classList.remove('open'); $('stepCode').style.display='none'; $('stepMain').style.display='block'; $('otpInput').value=''; }
+function closeAuth(){ const m = $('authModal'); if(!m) return; m.classList.remove('open'); $('stepCode').style.display='none'; $('stepMain').style.display='block'; }
 function bindAuth(){
   $('authBtn').addEventListener('click', async ()=>{ if(USER){ try{ await SB.auth.signOut(); }catch(e){} } else openAuth(); });
   $('authClose').addEventListener('click', closeAuth);
@@ -452,18 +451,12 @@ function bindAuth(){
   $('sendCode').addEventListener('click', async ()=>{
     const em = $('authEmail').value.trim();
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ $('authMsg').textContent = 'הזן כתובת מייל תקינה'; return; }
-    const {error} = await SB.auth.signInWithOtp({email: em});
-    if(error){ $('authMsg').textContent = 'שגיאה בשליחת הקוד. נסה שוב בעוד רגע.'; return; }
-    window._authEm = em;
-    $('authMsg').textContent = 'הקוד נשלח ל-' + em;
+    const {error} = await SB.auth.signInWithOtp({email: em, options: {emailRedirectTo: location.href.split('#')[0]}});
+    if(error){ $('authMsg').textContent = 'שגיאה בשליחה. נסה שוב בעוד רגע.'; return; }
+    $('authMsg').textContent = 'הקישור נשלח ל-' + em;
     $('stepMain').style.display='none'; $('stepCode').style.display='block';
-    $('otpInput').focus();
   });
-  $('verifyCode').addEventListener('click', async ()=>{
-    const {error} = await SB.auth.verifyOtp({email: window._authEm, token: $('otpInput').value.trim(), type: 'email'});
-    if(error){ $('authMsg').textContent = 'קוד שגוי או שפג תוקפו. נסה שוב.'; return; }
-    closeAuth();
-  });
+  $('closeAfterSend').addEventListener('click', closeAuth);
   $('backToMain').addEventListener('click', ()=>{ $('stepCode').style.display='none'; $('stepMain').style.display='block'; });
 }
 async function initAuth(){
