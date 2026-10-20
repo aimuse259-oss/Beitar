@@ -17,7 +17,7 @@ html{-webkit-text-size-adjust:100%}
 body{font-family:'Heebo',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.55}
 .wrap{max-width:1080px;margin:0 auto;padding:0 16px}
 
-/* header */
+
 header{background:linear-gradient(135deg,#101736 0%,#1a1440 60%,#0b0e1a 100%);border-bottom:1px solid var(--line);padding:34px 0 26px;position:relative;overflow:hidden}
 header::after{content:"";position:absolute;inset:0;background:radial-gradient(600px 200px at 85% 0%,rgba(255,207,0,.12),transparent 70%);pointer-events:none}
 header h1{font-size:clamp(26px,5vw,40px);font-weight:900;letter-spacing:-.5px}
@@ -25,7 +25,7 @@ header h1 .ac{color:var(--amber)}
 header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 .upd{display:inline-block;margin-top:12px;font-size:13px;color:var(--dim);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:4px 12px;border-radius:999px}
 
-/* controls */
+
 .controls{position:sticky;top:0;z-index:20;background:rgba(11,14,26,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 0}
 .controls .wrap{display:flex;gap:10px;flex-wrap:wrap}
 .search{flex:2;min-width:200px;position:relative}
@@ -56,7 +56,7 @@ header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 .pick select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font-family:inherit;font-size:16px;outline:none;cursor:pointer}
 .pick select:focus{border-color:var(--amber)}
 
-/* browse grid */
+
 .sec-t{font-size:20px;font-weight:800;margin:26px 0 14px;display:flex;align-items:center;gap:8px}
 .inst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .inst-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;transition:transform .15s,border-color .15s}
@@ -69,7 +69,7 @@ header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 .deg-n{font-size:13px;color:var(--mut);margin-top:6px}
 .odays{font-size:12px;color:var(--dim);margin-top:4px}
 
-/* institution view */
+
 .back{background:none;border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:8px 16px;font-family:inherit;font-size:14px;cursor:pointer;margin:22px 0 0}
 .back:hover{border-color:var(--amber);color:var(--txt)}
 .sum{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:22px;margin:14px 0 20px}
@@ -83,7 +83,7 @@ header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 .rbox .v{font-size:20px;font-weight:800;margin-top:2px}
 .rbox .v small{font-size:13px;color:var(--mut);font-weight:600}
 
-/* degree list */
+
 .deg{display:grid;grid-template-columns:1fr;gap:10px}
 .dcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
 .dcard .t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
@@ -98,7 +98,7 @@ header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 .notes{font-size:13.5px;color:var(--mut);margin-top:10px;line-height:1.6}
 .empty{text-align:center;color:var(--dim);padding:50px 20px;font-size:16px}
 
-/* search results */
+
 .res-group{margin-bottom:18px}
 .res-group h3{font-size:16px;color:var(--amber);margin-bottom:8px;font-weight:800}
 .res-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;cursor:pointer;font-size:15px}
@@ -163,7 +163,7 @@ let DATA = {institutions:[]};
 const $ = id => document.getElementById(id);
 const fmt = n => (n==null ? null : (Math.round(n*10)/10));
 
-/* ---- my scores + matching ---- */
+
 let MY = null, onlyMine = false;
 try{ MY = JSON.parse(localStorage.getItem('adm_my')||'null'); }catch(e){ MY = null; }
 function matchOf(d){
@@ -188,7 +188,7 @@ async function init(){
   buildSelect(); renderBrowse();
   $('q').addEventListener('input', onSearch);
   $('instSel').addEventListener('change', e=>{ if(e.target.value) showInst(e.target.value); });
-  // my scores panel
+  
   const panel = $('myPanel'), btn = $('myBtn');
   const syncBtn = ()=>{ btn.classList.toggle('on', !!MY); btn.textContent = MY ? '🎯 הציונים שלי ✓' : '🎯 הציונים שלי'; };
   syncBtn();
@@ -233,7 +233,8 @@ function renderBrowse(){
   document.querySelectorAll('.inst-card').forEach(c=>c.addEventListener('click',()=>showInst(c.dataset.id)));
 }
 function odaysSmall(i){
-  const od = i.open_days||[];
+  const today = new Date().toISOString().slice(0,10);
+  const od = (i.open_days||[]).filter(o=>o.date >= today);
   if(!od.length) return '';
   const txt = od.map(o=>o.label?`${o.label} ${o.date}`:o.date).join(' • ');
   return `<div class="odays">🗓️ ${txt}</div>`;
