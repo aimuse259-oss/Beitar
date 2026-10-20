@@ -122,8 +122,10 @@ footer b{color:var(--mut)}
 }
 .authbtn{max-width:320px;overflow:hidden;text-overflow:ellipsis;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap}
 .authbtn:hover{border-color:var(--teal)}
-.featbar{display:none;border-bottom:1px solid var(--line);background:var(--panel);padding:10px 0}
-.featbar.open{display:block}
+.featbar{border-bottom:1px solid var(--line);background:var(--panel);padding:10px 0}
+.featbar.locked .fbtn::after{content:" 🔒";font-size:12px}
+.feathint{display:none;font-size:13px;color:var(--dim);align-self:center}
+.featbar.locked .feathint{display:inline}
 .featbar .wrap{display:flex;gap:8px;flex-wrap:wrap}
 .fbtn{padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer}
 .fbtn:hover{border-color:var(--amber)}
@@ -192,11 +194,12 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
     <button id="myBtn" class="mybtn">🎯 הציונים שלי</button>
   </div>
 </div>
-<div class="featbar" id="featBar">
+<div class="featbar locked" id="featBar">
   <div class="wrap">
     <button class="fbtn" data-v="calc">🧮 מחשבון סכם</button>
     <button class="fbtn" data-v="cmp">⚖️ השוואת מוסדות</button>
     <button class="fbtn" data-v="fav">⭐ מועדפים</button>
+    <span class="feathint">למשתמשים רשומים בלבד • ההרשמה חינמית</span>
   </div>
 </div>
 <div id="myPanel">
@@ -222,7 +225,7 @@ html[data-theme="light"] .inst-card,html[data-theme="light"] .dcard,html[data-th
   <div class="modal">
     <button class="mclose" id="authClose">✕</button>
     <h3>כניסה לאתר</h3>
-    <p id="authMsg">התכונות המתקדמות - מחשבון סכם, השוואת מוסדות, מועדפים ושכר לימוד - זמינות למשתמשים רשומים בלבד.</p>
+    <p id="authMsg">התכונות המתקדמות - מחשבון סכם, השוואת מוסדות, מועדפים ושכר לימוד - זמינות למשתמשים רשומים. ההרשמה חינמית ולוקחת חצי דקה.</p>
     <div id="stepMain">
       <button class="gbtn" id="gLogin"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>כניסה עם Google</button>
       <div class="sep">או</div>
@@ -469,12 +472,12 @@ function setUser(u){
   const b = $('authBtn'); if(!b) return;
   if(u){
     b.textContent = 'יציאה (' + (u.email || 'מחובר') + ')';
-    $('featBar').classList.add('open');
+    $('featBar').classList.remove('locked');
     loadFavs().then(()=>{ if($('instView').style.display !== 'none') refreshView(); });
     loadMyScores();
   } else {
     b.textContent = '🔐 כניסה';
-    $('featBar').classList.remove('open');
+    $('featBar').classList.add('locked');
     FAVS = new Set();
     MY = null; onlyMine = false;
     try{ localStorage.removeItem('adm_my'); }catch(e){}
