@@ -1,9 +1,327 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="he">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title></title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דרישות סף | תנאי קבלה לאוניברסיטאות ומכללות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0e1a; --panel:#141a30; --panel2:#1a2240; --line:rgba(255,255,255,.09);
+  --txt:#eef1fa; --mut:#9fb2d8; --dim:#6b7694;
+  --amber:#ffcf00; --teal:#2dd4bf; --blue:#2f7fe0;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Heebo',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+
+/* header */
+header{background:linear-gradient(135deg,#101736 0%,#1a1440 60%,#0b0e1a 100%);border-bottom:1px solid var(--line);padding:34px 0 26px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;inset:0;background:radial-gradient(600px 200px at 85% 0%,rgba(255,207,0,.12),transparent 70%);pointer-events:none}
+header h1{font-size:clamp(26px,5vw,40px);font-weight:900;letter-spacing:-.5px}
+header h1 .ac{color:var(--amber)}
+header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
+.upd{display:inline-block;margin-top:12px;font-size:13px;color:var(--dim);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:4px 12px;border-radius:999px}
+
+/* controls */
+.controls{position:sticky;top:0;z-index:20;background:rgba(11,14,26,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 0}
+.controls .wrap{display:flex;gap:10px;flex-wrap:wrap}
+.search{flex:2;min-width:200px;position:relative}
+.search input{width:100%;padding:12px 44px 12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font-family:inherit;font-size:16px;outline:none}
+.search input:focus{border-color:var(--amber)}
+.search .ic{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.6;pointer-events:none}
+.mybtn{padding:12px 18px;border-radius:12px;border:1px solid rgba(255,207,0,.4);background:rgba(255,207,0,.1);color:var(--amber);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap}
+.mybtn:hover{background:rgba(255,207,0,.2)}
+.mybtn.on{background:var(--amber);color:#111}
+#myPanel{display:none;border-bottom:1px solid var(--line);background:var(--panel);padding:14px 0}
+#myPanel.open{display:block}
+#myPanel .wrap{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:12.5px;color:var(--dim);font-weight:700}
+.fld input{width:140px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-family:inherit;font-size:16px;outline:none}
+.fld input:focus{border-color:var(--amber)}
+.pbtn{padding:10px 20px;border-radius:10px;border:none;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.pbtn.save{background:var(--amber);color:#111}
+.pbtn.clear{background:none;border:1px solid var(--line);color:var(--mut)}
+.mbadge{font-size:12.5px;font-weight:800;padding:4px 12px;border-radius:999px;white-space:nowrap}
+.m-ok{background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.4)}
+.m-no{background:rgba(255,90,90,.13);color:#ff8a8a;border:1px solid rgba(255,90,90,.35)}
+.m-unk{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid var(--line)}
+.filt{display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-size:14.5px;font-weight:700;color:var(--mut);cursor:pointer;user-select:none}
+.filt input{width:18px;height:18px;accent-color:var(--amber);cursor:pointer}
+.match-n{font-size:13px;color:var(--teal);font-weight:700;margin-top:6px}
+.pick{flex:1;min-width:200px}
+.pick select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font-family:inherit;font-size:16px;outline:none;cursor:pointer}
+.pick select:focus{border-color:var(--amber)}
+
+/* browse grid */
+.sec-t{font-size:20px;font-weight:800;margin:26px 0 14px;display:flex;align-items:center;gap:8px}
+.inst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.inst-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;transition:transform .15s,border-color .15s}
+.inst-card:hover{transform:translateY(-2px);border-color:var(--amber)}
+.inst-card h3{font-size:17px;font-weight:800;line-height:1.4}
+.inst-card .meta{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(45,212,191,.14);color:var(--teal);border:1px solid rgba(45,212,191,.3)}
+.badge.uni{background:rgba(255,207,0,.12);color:var(--amber);border-color:rgba(255,207,0,.3)}
+.city{font-size:13px;color:var(--dim)}
+.deg-n{font-size:13px;color:var(--mut);margin-top:6px}
+.odays{font-size:12px;color:var(--dim);margin-top:4px}
+
+/* institution view */
+.back{background:none;border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:8px 16px;font-family:inherit;font-size:14px;cursor:pointer;margin:22px 0 0}
+.back:hover{border-color:var(--amber);color:var(--txt)}
+.sum{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:22px;margin:14px 0 20px}
+.sum h2{font-size:clamp(20px,4vw,28px);font-weight:900;line-height:1.4}
+.sum .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.src{font-size:13px;color:var(--dim);margin-top:10px}
+.src a{color:var(--teal);text-decoration:none}
+.range{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.rbox{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.rbox .l{font-size:12.5px;color:var(--dim);font-weight:600}
+.rbox .v{font-size:20px;font-weight:800;margin-top:2px}
+.rbox .v small{font-size:13px;color:var(--mut);font-weight:600}
+
+/* degree list */
+.deg{display:grid;grid-template-columns:1fr;gap:10px}
+.dcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.dcard .t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.dcard h4{font-size:16.5px;font-weight:800;line-height:1.45;flex:1;min-width:200px}
+.tt{font-size:12px;font-weight:700;color:var(--blue);background:rgba(47,127,224,.13);border:1px solid rgba(47,127,224,.3);padding:3px 10px;border-radius:999px;white-space:nowrap}
+.vals{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.val{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:120px}
+.val .l{font-size:12px;color:var(--dim);font-weight:600}
+.val .n{font-size:18px;font-weight:800}
+.val .n small{font-size:12px;color:var(--mut);font-weight:600}
+.val.na .n{color:var(--dim);font-size:14px;font-weight:600}
+.notes{font-size:13.5px;color:var(--mut);margin-top:10px;line-height:1.6}
+.empty{text-align:center;color:var(--dim);padding:50px 20px;font-size:16px}
+
+/* search results */
+.res-group{margin-bottom:18px}
+.res-group h3{font-size:16px;color:var(--amber);margin-bottom:8px;font-weight:800}
+.res-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;cursor:pointer;font-size:15px}
+.res-item:hover{border-color:var(--amber)}
+.res-item small{color:var(--dim);display:block;font-size:12.5px}
+
+footer{border-top:1px solid var(--line);margin-top:44px;padding:22px 0 34px;color:var(--dim);font-size:13px;line-height:1.7}
+footer b{color:var(--mut)}
+@media (max-width:600px){
+  .val{min-width:calc(50% - 5px);flex:1}
+  .controls .wrap{flex-direction:column}
+  .search,.pick{min-width:0}
+}
+</style>
 </head>
 <body>
+<header>
+  <div class="wrap">
+    <h1>דרישות סף <span class="ac">לאקדמיה</span></h1>
+    <p>תנאי קבלה מעודכנים לתואר ראשון — בכל אוניברסיטה ומכללה בישראל</p>
+    <span class="upd" id="upd">טוען נתונים…</span>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="search">
+      <span class="ic">🔍</span>
+      <input id="q" type="search" placeholder="חיפוש מדויק — שם תואר או מוסד…" autocomplete="off">
+    </div>
+    <div class="pick">
+      <select id="instSel"><option value="">בחירה מרשימה — כל המוסדות…</option></select>
+    </div>
+    <button id="myBtn" class="mybtn">🎯 הציונים שלי</button>
+  </div>
+</div>
+<div id="myPanel">
+  <div class="wrap">
+    <div class="fld"><label>ציון פסיכומטרי</label><input id="inPsy" type="number" min="200" max="800" placeholder="למשל 620"></div>
+    <div class="fld"><label>ממוצע בגרות</label><input id="inBag" type="number" min="0" max="120" step="0.1" placeholder="למשל 95"></div>
+    <button class="pbtn save" id="saveMy">שמור</button>
+    <button class="pbtn clear" id="clearMy">נקה</button>
+    <span style="font-size:12.5px;color:var(--dim)">נשמר רק בדפדפן שלך • האתר יציג התאמה לכל תואר</span>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="browse"></div>
+  <div id="results" style="display:none"></div>
+  <div id="instView" style="display:none"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <b>שימו לב:</b> האתר מציג תואר ראשון בלבד. הנתונים נאספו מהאתרים הרשמיים של המוסדות ומעודכנים לשנת הנתונים המצוינת ליד כל מוסד.
+    חתכי הקבלה משתנים משנה לשנה ותלויים בביקוש — יש לוודא תמיד מול המוסד עצמו לפני הגשת מועמדות.
+  </div>
+</footer>
+
+<script>
+let DATA = {institutions:[]};
+const $ = id => document.getElementById(id);
+const fmt = n => (n==null ? null : (Math.round(n*10)/10));
+
+/* ---- my scores + matching ---- */
+let MY = null, onlyMine = false;
+try{ MY = JSON.parse(localStorage.getItem('adm_my')||'null'); }catch(e){ MY = null; }
+function matchOf(d){
+  if(!MY) return null;
+  const p = d.psychometric, b = d.bagrut;
+  if(p==null && b==null) return 'unk';
+  if(p!=null && (MY.psy==null || MY.psy < p)) return 'no';
+  if(b!=null && (MY.bag==null || MY.bag < b)) return 'no';
+  return 'ok';
+}
+const MBADGE = {ok:'<span class="mbadge m-ok">✅ עומד בדרישות</span>',
+  no:'<span class="mbadge m-no">❌ לא עומד בדרישות</span>',
+  unk:'<span class="mbadge m-unk">❓ לא ידוע</span>'};
+function matchCount(i){ return (i.degrees||[]).filter(d=>matchOf(d)==='ok').length; }
+
+async function init(){
+  try{
+    const r = await fetch('data.json',{cache:'no-store'});
+    DATA = await r.json();
+  }catch(e){ $('browse').innerHTML = '<div class="empty">שגיאה בטעינת הנתונים</div>'; return; }
+  $('upd').textContent = 'עודכן: ' + (DATA.updated || '') + ' • ' + DATA.institutions.length + ' מוסדות';
+  buildSelect(); renderBrowse();
+  $('q').addEventListener('input', onSearch);
+  $('instSel').addEventListener('change', e=>{ if(e.target.value) showInst(e.target.value); });
+  // my scores panel
+  const panel = $('myPanel'), btn = $('myBtn');
+  const syncBtn = ()=>{ btn.classList.toggle('on', !!MY); btn.textContent = MY ? '🎯 הציונים שלי ✓' : '🎯 הציונים שלי'; };
+  syncBtn();
+  if(MY){ $('inPsy').value = MY.psy??''; $('inBag').value = MY.bag??''; }
+  btn.addEventListener('click', ()=>panel.classList.toggle('open'));
+  $('saveMy').addEventListener('click', ()=>{
+    const psy = parseFloat($('inPsy').value), bag = parseFloat($('inBag').value);
+    MY = {psy: isNaN(psy)?null:psy, bag: isNaN(bag)?null:bag};
+    if(MY.psy==null && MY.bag==null){ MY = null; localStorage.removeItem('adm_my'); }
+    else localStorage.setItem('adm_my', JSON.stringify(MY));
+    syncBtn(); panel.classList.remove('open'); refreshView();
+  });
+  $('clearMy').addEventListener('click', ()=>{
+    MY = null; onlyMine = false; localStorage.removeItem('adm_my');
+    $('inPsy').value=''; $('inBag').value=''; syncBtn(); panel.classList.remove('open'); refreshView();
+  });
+}
+function refreshView(){
+  const sel = $('instSel').value;
+  if(sel) showInst(sel); else { renderBrowse(); }
+}
+function buildSelect(){
+  const s = $('instSel');
+  const groups = {'אוניברסיטה':'אוניברסיטאות','מכללה':'מכללות'};
+  for(const [type,label] of Object.entries(groups)){
+    const og = document.createElement('optgroup'); og.label = label;
+    DATA.institutions.filter(i=>i.type===type).forEach(i=>{
+      const o = document.createElement('option'); o.value=i.id; o.textContent=i.name; og.appendChild(o);
+    });
+    if(og.children.length) s.appendChild(og);
+  }
+}
+function renderBrowse(){
+  const unis = DATA.institutions.filter(i=>i.type==='אוניברסיטה');
+  const cols = DATA.institutions.filter(i=>i.type==='מכללה');
+  let h = '';
+  if(unis.length) h += '<div class="sec-t">🎓 אוניברסיטאות</div><div class="inst-grid">' +
+    unis.map(card).join('') + '</div>';
+  if(cols.length) h += '<div class="sec-t">🏫 מכללות</div><div class="inst-grid">' +
+    cols.map(card).join('') + '</div>';
+  $('browse').innerHTML = h || '<div class="empty">אין נתונים עדיין</div>';
+  document.querySelectorAll('.inst-card').forEach(c=>c.addEventListener('click',()=>showInst(c.dataset.id)));
+}
+function odaysSmall(i){
+  const od = i.open_days||[];
+  if(!od.length) return '';
+  const txt = od.map(o=>o.label?`${o.label} ${o.date}`:o.date).join(' • ');
+  return `<div class="odays">🗓️ ${txt}</div>`;
+}
+function card(i){
+  const mc = MY ? `<div class="match-n">🎯 ${matchCount(i)} תארים מתאימים לך</div>` : '';
+  return `<div class="inst-card" data-id="${i.id}">
+    <h3>${i.name}</h3>
+    <div class="meta"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${i.type}</span><span class="city">${i.city||''}</span></div>
+    <div class="deg-n">${(i.degrees||[]).length} תארים • נתוני ${i.data_year||''}</div>
+    ${mc}
+    ${odaysSmall(i)}
+  </div>`;
+}
+function showInst(id){
+  const i = DATA.institutions.find(x=>x.id===id); if(!i) return;
+  $('browse').style.display='none'; $('results').style.display='none';
+  const v = $('instView'); v.style.display='block';
+  $('instSel').value = id;
+  const degs = i.degrees||[];
+  const psy = degs.map(d=>d.psychometric).filter(n=>n!=null);
+  const bag = degs.map(d=>d.bagrut).filter(n=>n!=null);
+  const rng = (a,lbl,unit) => a.length ?
+    `<div class="rbox"><div class="l">${lbl}</div><div class="v">${Math.min(...a)}–${Math.max(...a)} <small>${unit}</small></div></div>` :
+    `<div class="rbox"><div class="l">${lbl}</div><div class="v" style="font-size:14px;color:var(--dim)">לא פורסם</div></div>`;
+  const mc = MY ? matchCount(i) : null;
+  v.innerHTML = `
+    <button class="back" onclick="goHome()">→ חזרה לכל המוסדות</button>
+    <div class="sum">
+      <h2>${i.name}</h2>
+      <div class="row"><span class="badge ${i.type==='אוניברסיטה'?'uni':''}">${i.type}</span><span class="city">${i.city||''}</span>${mc!=null?`<span class="match-n" style="margin:0">🎯 ${mc} מתאימים לך</span>`:''}</div>
+      <div class="range">
+        ${rng(psy,'טווח פסיכומטרי (מינימום–מקסימום)','')}
+        ${rng(bag,'טווח ממוצע בגרות (מינימום–מקסימום)','')}
+        <div class="rbox"><div class="l">מספר תארים</div><div class="v">${degs.length}</div></div>
+      </div>
+      <div class="src">נתוני ${i.data_year||''} • מקור: ${i.source?`<a href="${i.source}" target="_blank" rel="noopener">האתר הרשמי</a>`:'האתר הרשמי'}</div>
+      ${odaysSmall(i)}
+    </div>
+    <div class="sec-t">📋 כל התארים ודרישות הסף</div>
+    ${MY?`<label class="filt"><input type="checkbox" id="onlyMine" ${onlyMine?'checked':''}> הצג רק תארים שמתאימים לי</label>`:''}
+    <div class="deg" id="degList">${degListHtml(degs)}</div>`;
+  const cb = $('onlyMine');
+  if(cb) cb.addEventListener('change', e=>{ onlyMine = e.target.checked; $('degList').innerHTML = degListHtml(degs); });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function degListHtml(degs){
+  const list = onlyMine && MY ? degs.filter(d=>matchOf(d)==='ok') : degs;
+  return list.map(dcard).join('') || '<div class="empty">אין תארים מתאימים עם הנתונים שהזנת</div>';
+}
+function dcard(d){
+  const pv = fmt(d.psychometric), bv = fmt(d.bagrut);
+  const m = matchOf(d);
+  return `<div class="dcard">
+    <div class="t"><h4>${d.name}</h4>${d.title?`<span class="tt">${d.title}</span>`:''}${m?MBADGE[m]:''}</div>
+    <div class="vals">
+      <div class="val ${pv==null?'na':''}"><div class="l">פסיכומטרי</div><div class="n">${pv==null?'לא פורסם':pv}</div></div>
+      <div class="val ${bv==null?'na':''}"><div class="l">ממוצע בגרות</div><div class="n">${bv==null?'לא פורסם':bv}</div></div>
+    </div>
+    ${d.notes?`<div class="notes">${d.notes}</div>`:''}
+  </div>`;
+}
+function goHome(){
+  $('instView').style.display='none'; $('results').style.display='none';
+  $('browse').style.display='block'; $('instSel').value=''; $('q').value='';
+  window.scrollTo({top:0});
+}
+function onSearch(e){
+  const q = e.target.value.trim();
+  const R = $('results'), B = $('browse'), V = $('instView');
+  if(!q){ R.style.display='none'; V.style.display='none'; B.style.display='block'; return; }
+  B.style.display='none'; V.style.display='none'; R.style.display='block';
+  const ql = q.toLowerCase();
+  let h = '';
+  DATA.institutions.forEach(i=>{
+    const im = i.name.toLowerCase().includes(ql);
+    const dm = (i.degrees||[]).filter(d=>d.name.toLowerCase().includes(ql));
+    if(im || dm.length){
+      h += `<div class="res-group"><h3>${i.name}</h3>`;
+      if(im && !dm.length) h += `<div class="res-item" data-id="${i.id}">פתיחת דף המוסד<small>${(i.degrees||[]).length} תארים</small></div>`;
+      dm.forEach(d=>{ h += `<div class="res-item" data-id="${i.id}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'—'} • בגרות: ${fmt(d.bagrut)??'—'}</small></div>`; });
+      h += '</div>';
+    }
+  });
+  R.innerHTML = h || '<div class="empty">לא נמצאו תוצאות</div>';
+  R.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click',()=>{ $('q').value=''; showInst(el.dataset.id); }));
+}
+init();
+</script>
 </body>
 </html>
