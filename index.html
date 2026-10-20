@@ -58,6 +58,10 @@ header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 
 
 .sec-t{font-size:20px;font-weight:800;margin:26px 0 14px;display:flex;align-items:center;gap:8px}
+.pills{display:flex;gap:10px;margin:20px 0 4px;flex-wrap:wrap}
+.pill{padding:10px 20px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--mut);font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.pill:hover{border-color:var(--amber);color:var(--txt)}
+.pill.active{background:var(--amber);color:#111;border-color:var(--amber)}
 .inst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .inst-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;transition:transform .15s,border-color .15s}
 .inst-card:hover{transform:translateY(-2px);border-color:var(--amber)}
@@ -160,6 +164,7 @@ footer b{color:var(--mut)}
 
 <script>
 let DATA = {institutions:[]};
+let typeFilter = 'all';
 const $ = id => document.getElementById(id);
 const fmt = n => (n==null ? null : (Math.round(n*10)/10));
 
@@ -226,13 +231,19 @@ function buildSelect(){
 function renderBrowse(){
   const unis = DATA.institutions.filter(i=>i.type==='אוניברסיטה');
   const cols = DATA.institutions.filter(i=>i.type==='מכללה');
-  let h = '';
-  if(unis.length) h += '<div class="sec-t">🎓 אוניברסיטאות</div><div class="inst-grid">' +
-    unis.map(card).join('') + '</div>';
-  if(cols.length) h += '<div class="sec-t">🏫 מכללות</div><div class="inst-grid">' +
-    cols.map(card).join('') + '</div>';
+  const total = DATA.institutions.length;
+  let h = `<div class="pills">
+    <button class="pill ${typeFilter==='all'?'active':''}" data-f="all">הכל (${total})</button>
+    <button class="pill ${typeFilter==='uni'?'active':''}" data-f="uni">🎓 אוניברסיטאות (${unis.length})</button>
+    <button class="pill ${typeFilter==='col'?'active':''}" data-f="col">🏫 מכללות (${cols.length})</button>
+  </div>`;
+  if((typeFilter==='all' || typeFilter==='uni') && unis.length)
+    h += '<div class="sec-t">🎓 אוניברסיטאות</div><div class="inst-grid">' + unis.map(card).join('') + '</div>';
+  if((typeFilter==='all' || typeFilter==='col') && cols.length)
+    h += '<div class="sec-t">🏫 מכללות</div><div class="inst-grid">' + cols.map(card).join('') + '</div>';
   $('browse').innerHTML = h || '<div class="empty">אין נתונים עדיין</div>';
   document.querySelectorAll('.inst-card').forEach(c=>c.addEventListener('click',()=>showInst(c.dataset.id)));
+  document.querySelectorAll('.pill').forEach(p=>p.addEventListener('click',()=>{ typeFilter = p.dataset.f; renderBrowse(); }));
 }
 function odaysSmall(i){
   const today = new Date().toISOString().slice(0,10);
