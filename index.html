@@ -396,7 +396,7 @@ function showInst(id){
   const cb = $('onlyMine');
   if(cb) cb.addEventListener('change', e=>{ onlyMine = e.target.checked; $('degList').innerHTML = degListHtml(degs, id); bindStars(v); });
   bindStars(v);
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(!window._noTopScroll) window.scrollTo({top:0,behavior:'smooth'});
 }
 function degListHtml(degs, instId){
   const list = onlyMine && MY ? degs.filter(d=>matchOf(d)==='ok') : degs;
@@ -521,8 +521,12 @@ async function toggleFav(instId, dname){
     if(FAVS.has(k)){ FAVS.delete(k); await SB.from('favorites').delete().eq('institution', instId).eq('degree', dname); }
     else { FAVS.add(k); await SB.from('favorites').insert({user_id: USER.id, institution: instId, degree: dname}); }
   }catch(e){}
+  const y = window.scrollY;
+  window._noTopScroll = true;
   if($('favView').style.display !== 'none') buildFav();
   else if($('instView').style.display !== 'none') refreshView();
+  window._noTopScroll = false;
+  window.scrollTo(0, y);
 }
 async function loadMyScores(){
   if(!USER || !SB) return;
