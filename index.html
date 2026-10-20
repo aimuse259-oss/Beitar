@@ -102,6 +102,7 @@ header p{color:var(--mut);margin-top:6px;font-size:clamp(14px,2.6vw,17px)}
 .val .n small{font-size:12px;color:var(--mut);font-weight:600}
 .val.na .n{color:var(--dim);font-size:14px;font-weight:600}
 .notes{font-size:13.5px;color:var(--mut);margin-top:10px;line-height:1.6}
+.subjline{font-size:13px;color:var(--dim);margin-top:8px}
 .empty{text-align:center;color:var(--dim);padding:50px 20px;font-size:16px}
 
 
@@ -443,6 +444,17 @@ function degListHtml(degs, instId){
   const list = onlyMine && MY ? degs.filter(d=>matchOf(d, instId)==='ok') : degs;
   return list.map(d=>dcard(d, instId)).join('') || '<div class="empty">אין תארים מתאימים עם הנתונים שהזנת</div>';
 }
+function subjLine(d){
+  const s = d.subj || {};
+  const math = s.math_units != null ? `מתמטיקה: ${s.math_units} יח״ל${s.math_grade != null ? ' בציון ' + s.math_grade + ' ומעלה' : ' (ציון עובר)'}`
+    : (s.math_grade != null ? `מתמטיקה: ציון ${s.math_grade} ומעלה` : 'מתמטיקה: לא ידוע');
+  let eng = null;
+  if(s.eng_units != null) eng = `אנגלית: ${s.eng_units} יח״ל${s.eng_grade != null ? ' בציון ' + s.eng_grade + ' ומעלה' : ' (ציון עובר)'}`;
+  else if(s.eng_grade != null) eng = `אנגלית: ציון ${s.eng_grade} ומעלה`;
+  if(s.eng_level) eng = (eng ? eng + ' • ' : 'אנגלית: ') + 'רמת ' + s.eng_level;
+  if(!eng) eng = 'אנגלית: לא ידוע';
+  return `📐 ${math} • ${eng}`;
+}
 function dcard(d, instId){
   const pv = fmt(d.psychometric), bv = fmt(d.bagrut), sv = fmt(d.sechem_min);
   const m = matchOf(d, instId);
@@ -456,6 +468,7 @@ function dcard(d, instId){
       ${sv!=null?`<div class="val"><div class="l">סכם / התאמה נדרש</div><div class="n">${sv}</div></div>`:''}
     </div>
     ${blk.length?`<div class="blockline">🚫 חסום עבורך: ${blk.join(' • ')}</div>`:''}
+    <div class="subjline">${subjLine(d)}</div>
     ${d.notes?`<div class="notes">${d.notes}</div>`:''}
   </div>`;
 }
