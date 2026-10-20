@@ -487,18 +487,25 @@ function onSearch(e){
   if(!q){ R.style.display='none'; V.style.display='none'; B.style.display='block'; return; }
   B.style.display='none'; V.style.display='none'; R.style.display='block';
   const ql = q.toLowerCase();
-  let h = '';
+  let groups = '';
   DATA.institutions.forEach(i=>{
     const im = i.name.toLowerCase().includes(ql);
-    const dm = (i.degrees||[]).filter(d=>d.name.toLowerCase().includes(ql));
-    if(im || dm.length){
-      h += `<div class="res-group"><h3>${i.name}</h3>`;
-      if(im && !dm.length) h += `<div class="res-item" data-id="${i.id}">פתיחת דף המוסד<small>${(i.degrees||[]).length} תארים</small></div>`;
-      dm.forEach(d=>{ h += `<div class="res-item" data-id="${i.id}" data-deg="${escA(d.name)}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'-'} • בגרות: ${fmt(d.bagrut)??'-'}</small></div>`; });
-      h += '</div>';
+    let dm = (i.degrees||[]).filter(d=>d.name.toLowerCase().includes(ql));
+    if(onlyMine && MY){
+      dm = im ? (i.degrees||[]).filter(d=>matchOf(d, i.id)==='ok') : dm.filter(d=>matchOf(d, i.id)==='ok');
+    }
+    const showRow = im && !dm.length && !(onlyMine && MY);
+    if(dm.length || showRow){
+      groups += `<div class="res-group"><h3>${i.name}</h3>`;
+      if(showRow) groups += `<div class="res-item" data-id="${i.id}">פתיחת דף המוסד<small>${(i.degrees||[]).length} תארים</small></div>`;
+      dm.forEach(d=>{ groups += `<div class="res-item" data-id="${i.id}" data-deg="${escA(d.name)}">🎓 ${d.name}<small>פסיכומטרי: ${fmt(d.psychometric)??'-'} • בגרות: ${fmt(d.bagrut)??'-'}</small></div>`; });
+      groups += '</div>';
     }
   });
-  R.innerHTML = h || '<div class="empty">לא נמצאו תוצאות</div>';
+  const filt = MY ? `<label class="filt"><input type="checkbox" id="onlyMineSearch" ${onlyMine?'checked':''}> הצג רק מה שמתאים לציונים שלי</label>` : '';
+  R.innerHTML = filt + (groups || `<div class="empty">${onlyMine && MY ? 'אין תארים מתאימים עם הנתונים שהזנת' : 'לא נמצאו תוצאות'}</div>`);
+  const scb = $('onlyMineSearch');
+  if(scb) scb.addEventListener('change', e=>{ onlyMine = e.target.checked; onSearch({target: $('q')}); });
   R.querySelectorAll('.res-item').forEach(el=>el.addEventListener('click',()=>{
     const deg = el.dataset.deg;
     $('q').value='';
