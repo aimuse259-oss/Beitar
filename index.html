@@ -616,7 +616,7 @@ function buildSugg(){
     });
     items = [...items, ...fuzzy];
   }
-  suggItems = items.slice(0, 8); suggIdx = -1;
+  suggItems = items.slice(0, 30); suggIdx = -1;
   if(!suggItems.length){ hideSugg(); return; }
   box.innerHTML = suggItems.map((x,ix)=>`<div class="si" data-ix="${ix}"><span>${x.t==='i'?'🏛️':'🎓'} ${x.label}</span><small>${x.sub}</small></div>`).join('');
   box.style.display='block';
