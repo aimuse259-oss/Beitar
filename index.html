@@ -312,7 +312,7 @@ async function init(){
     $('inPsy').value=''; $('inBag').value=''; syncBtn(); panel.classList.remove('open'); refreshView();
   });
   document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click', ()=>{ if(!USER){ openAuth(); return; } showFeatView(b.dataset.v); }));
-  bindAuth(); initAuth(); bindTheme();
+  bindAuth(); initAuth(); bindTheme(); countView();
 }
 function refreshView(){
   const sel = $('instSel').value;
@@ -656,6 +656,14 @@ function buildFav(){
   else groups.forEach(g=>{ h += `<div class="res-group"><h3>${g.i.name}</h3><div class="deg">${g.ds.map(d=>dcard(d, g.i.id)).join('')}</div></div>`; });
   v.innerHTML = h;
   bindStars(v);
+}
+function countView(){
+  if(!SB) return;
+  try{
+    if(sessionStorage.getItem('adm_pv')) return;
+    sessionStorage.setItem('adm_pv', '1');
+    SB.from('pageviews').insert({}).then(()=>{}, ()=>{});
+  }catch(e){}
 }
 function syncTheme(){
   const b = $('themeBtn'); if(!b) return;
